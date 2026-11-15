@@ -22,6 +22,7 @@ add_executable(abandon_all_hope
   src/core/scene.c
   src/core/blocks.c
   src/core/state.c
+  src/core/storage.c
   src/world/solids.c
   src/world/openings.c
   src/world/world.c
@@ -35,6 +36,10 @@ add_executable(abandon_all_hope
   src/audio/synth.c
   src/audio/sfx.c
   src/audio/music.c
+  src/ui/hud.c
+  src/ui/upgrades.c
+  src/ui/title.c
+  src/game.c
 )
 
 target_include_directories(abandon_all_hope PRIVATE src)
