@@ -2,6 +2,8 @@
 #include "core/math_util.h"
 #include "core/scene.h"
 #include "entities/player.h"
+#include "audio/synth.h"
+#include "audio/sfx.h"
 #include "rlgl.h"
 #include <math.h>
 #include <string.h>
@@ -101,7 +103,13 @@ void weather_update(float dt, bool running) {
 
     if (w->thunderIn >= 0.0f) {
         w->thunderIn -= dt;
-        // Audio hook will trigger when thunderIn < 0
+        if (w->thunderIn < 0.0f) sfx_thunder(w->thunderNear);
+    }
+
+    w->soundT -= dt;
+    if (w->soundT <= 0.0f) {
+        w->soundT = 0.2f;
+        synth_set_weather(L, w->gust);
     }
 
     if (w->flashT >= 0.0f) {

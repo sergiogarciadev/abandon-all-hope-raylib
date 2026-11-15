@@ -2,6 +2,7 @@
 #include "core/math_util.h"
 #include "core/scene.h"
 #include "effects/particles.h"
+#include "audio/sfx.h"
 #include "raymath.h"
 #include <math.h>
 #include <float.h>
@@ -246,11 +247,13 @@ void hit_opening(Opening *o) {
     o->hp--;
     o->jolt = 1.0f;
     if (o->kind == OPENING_DOOR) {
+        sfx_bash((Vector3){ o->x, 0.0f, o->z }, 1.0f);
         Vector3 into = Vector3Normalize((Vector3){ o->ix - o->x, 0, o->iz - o->z });
         spawn_opening_burst((Vector3){ o->x, 0, o->z }, into, o->w, true, o->sill, o->head,
                             2, DEBRIS_WOOD, 0.12f, 2.0f);
     } else if (o->hp > 0) {
         o->glassCracked = true;
+        sfx_crack((Vector3){ o->x, 0.0f, o->z });
     }
     if (o->hp <= 0) break_opening(o);
 }
@@ -262,12 +265,14 @@ void break_opening(Opening *o) {
     if (o->kind == OPENING_DOOR) {
         o->fallT = 0.0f;
         o->leafRotY = 0.0f;
+        sfx_door_break((Vector3){ o->x, 0.0f, o->z });
         spawn_opening_burst((Vector3){ o->x, 0, o->z }, into, o->w, true, o->sill, o->head,
                             9, DEBRIS_WOOD, 0.16f, 3.5f);
     } else {
         o->glassVisible = false;
         o->barsVisible = false;
         o->shardsVisible = true;
+        sfx_shatter((Vector3){ o->x, 0.0f, o->z });
         spawn_opening_burst((Vector3){ o->x, 0, o->z }, into, o->w, false, o->sill, o->head,
                             16, DEBRIS_GLASS, 0.09f, 4.0f);
     }

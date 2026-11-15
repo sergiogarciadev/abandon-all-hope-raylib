@@ -6,6 +6,7 @@
 #include "world/world.h"
 #include "world/openings.h"
 #include "effects/particles.h"
+#include "audio/sfx.h"
 #include "rlgl.h"
 #include <math.h>
 #include <string.h>
@@ -20,11 +21,13 @@ void weapon_start_reload(void) {
     if (!gState.running || gState.reloading || gState.mag == gState.magSize) return;
     gState.reloading = true;
     gState.reloadT = 0.0f;
+    sfx_reload_out();
 }
 
 void weapon_finish_reload(void) {
     gState.reloading = false;
     gState.mag = gState.magSize;
+    sfx_reload_in();
 }
 
 void weapon_fire(Vector3 aimPoint) {
@@ -66,6 +69,7 @@ void weapon_fire(Vector3 aimPoint) {
     }
 
     player_muzzle_flash(hot);
+    sfx_shot(hot, gState.spread);
 
     // Eject brass casing & muzzle smoke
     Vector3 right = Vector3Normalize((Vector3){ -gPlayer.mGun.m0, -gPlayer.mGun.m1, -gPlayer.mGun.m2 });
@@ -122,6 +126,7 @@ void weapon_update_bullets(float dt) {
                     if (o->kind == OPENING_DOOR) {
                         hit = true;
                         o->jolt = 0.4f;
+                        sfx_bash((Vector3){ o->x, 0.0f, o->z }, 0.4f);
                         Vector3 into = Vector3Normalize((Vector3){ o->ix - o->x, 0, o->iz - o->z });
                         spawn_opening_burst((Vector3){ o->x, 0, o->z }, into, o->w, true, o->sill, o->head,
                                             1, DEBRIS_WOOD, 0.08f, 1.5f);
@@ -156,7 +161,10 @@ void weapon_update_bullets(float dt) {
                 z->pos.x += b->dir.x * 0.25f;
                 z->pos.z += b->dir.z * 0.25f;
                 if (z->hp <= 0.0f) {
+                    sfx_zdeath(z->pos);
                     zombies_kill(z, b->dir);
+                } else {
+                    sfx_hit(z->pos);
                 }
                 if (b->hitCount < MAX_PIERCE_HITS) b->hitIds[b->hitCount++] = z->id;
                 if (b->pierce > 0) b->pierce--;

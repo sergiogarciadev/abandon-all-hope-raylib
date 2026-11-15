@@ -12,6 +12,9 @@
 #include "entities/weapon.h"
 #include "entities/zombies.h"
 #include "entities/drops.h"
+#include "audio/synth.h"
+#include "audio/sfx.h"
+#include "audio/music.h"
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
@@ -29,6 +32,9 @@ int main(void) {
     zombies_init();
     drops_init();
     weapon_clear();
+    synth_init();
+    music_init();
+    music_set_mode(MUSIC_COMBAT);
 
     Vector3 aimPoint = { 0.0f, 0.9f, 5.0f };
 
@@ -87,6 +93,7 @@ int main(void) {
 
         world_update(dt, gWeather.level);
         update_openings(dt);
+        music_update_state(gState.wave, gZombieCount, gState.hp <= 1, dt);
 
         gScene.camera.target = gPlayer.position;
         gScene.camera.position = (Vector3){
@@ -111,10 +118,11 @@ int main(void) {
         weather_draw();
         EndMode3D();
 
-        DrawText(TextFormat("Step 7: Weather, Debris & Drops | KILLS: %d", gState.kills), 20, 20, 20, RAYWHITE);
+        DrawText(TextFormat("Step 8: Procedural Audio & Music | KILLS: %d", gState.kills), 20, 20, 20, RAYWHITE);
         EndDrawing();
     }
 
+    synth_cleanup();
     drops_cleanup();
     zombies_cleanup();
     player_cleanup();

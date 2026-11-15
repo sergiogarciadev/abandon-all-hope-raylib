@@ -9,6 +9,7 @@
 #include "world/world.h"
 #include "effects/particles.h"
 #include "entities/drops.h"
+#include "audio/sfx.h"
 #include "raymath.h"
 #include <math.h>
 #include <string.h>
@@ -558,6 +559,8 @@ void zombies_chase(Zombie *z, float dt) {
                 hit_opening(o);
             } else if (pd < Z_HIT_RANGE && !wall_between(z->pos, p)) {
                 if (gHurtCb) gHurtCb();
+            } else {
+                sfx_swipe(z->pos);
             }
         }
         if (z->swing >= Z_SWING) {

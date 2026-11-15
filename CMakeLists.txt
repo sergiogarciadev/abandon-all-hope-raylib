@@ -32,10 +32,13 @@ add_executable(abandon_all_hope
   src/entities/weapon.c
   src/entities/zombies.c
   src/entities/drops.c
+  src/audio/synth.c
+  src/audio/sfx.c
+  src/audio/music.c
 )
 
 target_include_directories(abandon_all_hope PRIVATE src)
-target_link_libraries(abandon_all_hope PRIVATE raylib m)
+target_link_libraries(abandon_all_hope PRIVATE raylib m pthread)
 
 if(CMAKE_C_COMPILER_ID MATCHES "Clang")
   target_compile_options(abandon_all_hope PRIVATE -Wall -Wextra -Wno-missing-braces)

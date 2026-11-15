@@ -5,6 +5,7 @@
 #include "core/scene.h"
 #include "core/state.h"
 #include "effects/particles.h"
+#include "audio/sfx.h"
 #include "rlgl.h"
 #include <math.h>
 
@@ -258,9 +259,12 @@ void player_animate(float dt, float mx, float mz) {
     Matrix mLowerWorld = MatrixMultiply(gPlayer.mLower, gPlayer.mRoot);
     gPlayer.mPelvis = MatrixMultiply(mPelvisLocal, mLowerWorld);
 
+    static float prevP[2] = { 0.0f, 0.5f };
     for (int i = 0; i < 2; i++) {
         float side = (i == 0) ? 1.0f : -1.0f;
         float p = fmodf(gPlayer.phase + i * 0.5f, 1.0f);
+        if (p < prevP[i] && drive > 0.3f) sfx_step();
+        prevP[i] = p;
         FootPose fp = foot_cycle(p, BETA);
         float restZ = side > 0.0f ? 0.12f : -0.1f;
         Vector3 foot = {
