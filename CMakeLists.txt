@@ -21,9 +21,12 @@ add_executable(abandon_all_hope
   src/main.c
   src/core/scene.c
   src/core/blocks.c
+  src/core/state.c
   src/world/solids.c
   src/world/openings.c
   src/world/world.c
+  src/entities/animation.c
+  src/entities/player.c
 )
 
 target_include_directories(abandon_all_hope PRIVATE src)
