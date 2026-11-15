@@ -20,49 +20,139 @@ typedef struct {
     const char *name;
     const char *desc;
     int maxLevel;
-    uint8_t icon[8]; // 8x8 1-bit pixel art
+    const char *icon[8]; // 8x8 pixel art: 'X' = solid, 'o' = dim
 } UpgradeDef;
 
 static const UpgradeDef UPGRADE_DEFS[UPGRADE_COUNT] = {
     {
         "mag", UPG_HANDLING, "EXTENDED MAG", "+4 rounds per magazine", 5,
-        { 0x3c, 0x24, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, 0x7e }
+        {
+            "XX.XX.XX",
+            "XX.XX.XX",
+            "oo.oo.oo",
+            "oo.oo.oo",
+            "oo.oo.oo",
+            "oo.oo.oo",
+            "XX.XX.XX",
+            "........"
+        }
     },
     {
         "reload", UPG_HANDLING, "QUICK HANDS", "reload 25% faster", 4,
-        { 0x18, 0x3c, 0x7e, 0x18, 0x18, 0x7e, 0x3c, 0x18 }
+        {
+            "..XXXX..",
+            ".X....XX",
+            "X....XXX",
+            "X.......",
+            "X......X",
+            "X......X",
+            ".X....X.",
+            "..XXXX.."
+        }
     },
     {
         "damage", UPG_FIREPOWER, "HOLLOW POINTS", "+50% bullet damage", 6,
-        { 0x18, 0x3c, 0x3c, 0x7e, 0x7e, 0x7e, 0x7e, 0x3c }
+        {
+            ".XXXXXX.",
+            "XXXXXXXX",
+            "X..XX..X",
+            "X..XX..X",
+            "XXXXXXXX",
+            ".XXX.XX.",
+            "..XXXX..",
+            "..X.X.X."
+        }
     },
     {
         "rate", UPG_FIREPOWER, "HAIR TRIGGER", "fire 20% faster", 4,
-        { 0x18, 0x30, 0x7e, 0x3c, 0x18, 0x30, 0x60, 0x40 }
+        {
+            "....XXX.",
+            "...XXX..",
+            "..XXX...",
+            ".XXXXXX.",
+            "...XXX..",
+            "..XXX...",
+            ".XX.....",
+            ".X......"
+        }
     },
     {
         "pierce", UPG_FIREPOWER, "PIERCING", "shots pierce +1 zombie", 3,
-        { 0x08, 0x1c, 0x3e, 0x7f, 0x3e, 0x1c, 0x08, 0x08 }
+        {
+            ".o..o...",
+            ".o..o.X.",
+            ".o..o..X",
+            "XXXXXXXX",
+            ".o..o..X",
+            ".o..o.X.",
+            ".o..o...",
+            "........"
+        }
     },
     {
         "spread", UPG_FIREPOWER, "BUCKSHOT", "+1 bullet per shot", 3,
-        { 0x81, 0x42, 0x24, 0x18, 0x18, 0x24, 0x42, 0x81 }
+        {
+            "......XX",
+            "....oo..",
+            "..oo....",
+            "XXooooXX",
+            "..oo....",
+            "....oo..",
+            "......XX",
+            "........"
+        }
     },
     {
         "hp", UPG_SURVIVAL, "THICK SKIN", "+1 max health, and heal it", 3,
-        { 0x66, 0xff, 0xff, 0xff, 0x7e, 0x3c, 0x18, 0x00 }
+        {
+            "XXXXXXXX",
+            "XooooooX",
+            "XoooXooX",
+            "XooXXXoX",
+            ".XooXoX.",
+            ".XooooX.",
+            "..XooX..",
+            "...XX..."
+        }
     },
     {
         "speed", UPG_SURVIVAL, "FLEET FOOT", "move 12% faster", 3,
-        { 0x1c, 0x3e, 0x7c, 0x38, 0x70, 0xe0, 0x40, 0x00 }
+        {
+            "........",
+            "XX..XX..",
+            ".XX..XX.",
+            "..XX..XX",
+            ".XX..XX.",
+            "XX..XX..",
+            "........",
+            "........"
+        }
     },
     {
         "luck", UPG_FORTUNE, "SCAVENGER", "more supply drops", 3,
-        { 0x3c, 0x7e, 0xdb, 0xff, 0xff, 0x7e, 0x3c, 0x00 }
+        {
+            "XXXXXXXX",
+            "XX....XX",
+            "X.X..X.X",
+            "X..XX..X",
+            "X..XX..X",
+            "X.X..X.X",
+            "XX....XX",
+            "XXXXXXXX"
+        }
     },
     {
         "heal", UPG_SURVIVAL, "PATCH UP", "restore all health", INT_MAX,
-        { 0x18, 0x18, 0x7e, 0x7e, 0x18, 0x18, 0x00, 0x00 }
+        {
+            ".XX..XX.",
+            "XXXXXXXX",
+            "XXXXXXXX",
+            "XXXXXXXX",
+            ".XXXXXX.",
+            "..XXXX..",
+            "...XX...",
+            "........"
+        }
     }
 };
 
@@ -81,6 +171,7 @@ static int sChoices[3] = { -1, -1, -1 };
 static int sChoiceCount = 0;
 static int sHovered = -1;
 static float sAnimT = 0.0f;
+static bool sHealed = false;
 
 static bool upgrade_eligible(int idx) {
     if (idx < 0 || idx >= UPGRADE_COUNT) return false;
@@ -105,7 +196,8 @@ static void apply_upgrade(int idx) {
     }
 }
 
-void upgrades_open(void) {
+void upgrades_open(bool healed) {
+    sHealed = healed;
     int pool[UPGRADE_COUNT];
     int poolN = 0;
     for (int i = 0; i < UPGRADE_COUNT; i++) {
@@ -186,14 +278,17 @@ bool upgrades_update(float dt) {
     return false;
 }
 
-static void draw_pixel_icon(const uint8_t rows[8], int cx, int cy, int pxSize, Color col) {
+static void draw_pixel_icon(const char *const rows[8], int cx, int cy, int pxSize, Color col) {
     int x0 = cx - 4 * pxSize;
     int y0 = cy - 4 * pxSize;
+    Color dim = { col.r, col.g, col.b, 95 };
     for (int r = 0; r < 8; r++) {
-        uint8_t row = rows[r];
-        for (int c = 0; c < 8; c++) {
-            if (row & (0x80 >> c)) {
+        const char *row = rows[r];
+        for (int c = 0; c < 8 && row[c] != '\0'; c++) {
+            if (row[c] == 'X') {
                 DrawRectangle(x0 + c * pxSize, y0 + r * pxSize, pxSize, pxSize, col);
+            } else if (row[c] == 'o') {
+                DrawRectangle(x0 + c * pxSize, y0 + r * pxSize, pxSize, pxSize, dim);
             }
         }
     }
@@ -206,13 +301,16 @@ void upgrades_draw(void) {
 
     DrawRectangle(0, 0, sw, sh, (Color){ 6, 8, 12, 185 });
 
-    const char *hdr = "WAVE CLEARED - CHOOSE AN UPGRADE";
+    const char *hdr = TextFormat("WAVE %d CLEARED", gState.wave);
     int hw = MeasureText(hdr, 28);
     DrawText(hdr, (sw - hw) / 2, sh / 2 - 205, 28, hex_color(0xe8d28a, 255));
 
-    const char *sub = "Click a card or press [1] [2] [3]";
+    const char *sub = sHealed
+        ? "+1 HEALTH  ·  CHOOSE ONE  ([1] [2] [3])"
+        : "CHOOSE ONE  ([1] [2] [3])";
     int suw = MeasureText(sub, 16);
-    DrawText(sub, (sw - suw) / 2, sh / 2 - 168, 16, (Color){ 175, 185, 200, 220 });
+    DrawText(sub, (sw - suw) / 2, sh / 2 - 168, 16,
+             sHealed ? hex_color(0x8fae6b, 255) : (Color){ 175, 185, 200, 220 });
 
     for (int i = 0; i < sChoiceCount; i++) {
         int idx = sChoices[i];

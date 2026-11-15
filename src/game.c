@@ -26,6 +26,7 @@
 #define HURT_IFRAMES 1.5f
 
 static Vector3 sAimPoint = { 0.0f, 0.9f, 5.0f };
+static bool sWaveHealed = false;
 
 static const char *wave_omen(int n) {
     if (n == 1)  return "they are already here";
@@ -274,13 +275,15 @@ void game_update(float dt) {
         } else if (gZombieCount == 0 && !gState.choosing) {
             if (gState.intermission <= 0.0f) {
                 gState.intermission = 1.6f;
+                sWaveHealed = gState.hp < gState.maxHp;
+                if (sWaveHealed) gState.hp++;
                 sfx_wave_clear();
                 music_set_mode(MUSIC_CALM);
-                hud_wave_banner("WAVE CLEARED", "catch your breath");
+                hud_wave_banner("WAVE CLEARED", sWaveHealed ? "+1 health · catch your breath" : "catch your breath");
             } else {
                 gState.intermission -= dt;
                 if (gState.intermission <= 0.0f) {
-                    upgrades_open();
+                    upgrades_open(sWaveHealed);
                     if (!gState.choosing) {
                         music_set_mode(MUSIC_COMBAT);
                         start_wave(gState.wave + 1);
