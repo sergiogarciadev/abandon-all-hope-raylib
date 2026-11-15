@@ -35,5 +35,6 @@ void title_start_swoop(void);
 void title_set_death_info(int wave, int kills, bool isNewBest);
 void title_update(float dt, Camera3D *cam, Vector3 playerPos);
 void title_draw(void);
+bool title_should_quit(void);
 
 #endif // TITLE_H

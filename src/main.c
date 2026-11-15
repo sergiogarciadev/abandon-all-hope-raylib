@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "game.h"
+#include "ui/title.h"
 #include <math.h>
 
 int main(void) {
@@ -10,7 +11,7 @@ int main(void) {
 
     game_init();
 
-    while (!WindowShouldClose()) {
+    while (!WindowShouldClose() && !title_should_quit()) {
         float dt = fminf(GetFrameTime(), 0.05f);
         game_update(dt);
         game_draw();

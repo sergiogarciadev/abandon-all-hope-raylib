@@ -76,17 +76,32 @@ void hud_draw(void) {
     DrawText(TextFormat("KILLS: %d", gState.kills), 30, 53, 18, hex_color(0xd8dde6, 255));
     DrawText(TextFormat("LEFT: %d", left), 30, 74, 18, hex_color(0xd6453c, 255));
 
-    // Top-center: Health pips + active powerups
-    int pipW = 24, pipH = 14, pipGap = 6;
+    // Top-center: Heart-shaped health pips + active powerups
+    static const char *HEART_PIX[7] = {
+        ".XX..XX.",
+        "XXXXXXXX",
+        "XXXXXXXX",
+        "XXXXXXXX",
+        ".XXXXXX.",
+        "..XXXX..",
+        "...XX..."
+    };
+    int px = 3;
+    int pipW = 8 * px, pipH = 7 * px, pipGap = 8;
     int totalHpW = gState.maxHp * pipW + (gState.maxHp - 1) * pipGap;
     int hpX = (sw - totalHpW) / 2;
-    int hpY = 22;
-    DrawRectangle(hpX - 12, hpY - 8, totalHpW + 24, pipH + 16, (Color){ 10, 12, 16, 150 });
+    int hpY = 20;
+    DrawRectangle(hpX - 14, hpY - 8, totalHpW + 28, pipH + 16, (Color){ 10, 12, 16, 150 });
     for (int i = 0; i < gState.maxHp; i++) {
-        int x = hpX + i * (pipW + pipGap);
-        Color fill = (i < gState.hp) ? hex_color(0xd6453c, 255) : (Color){ 42, 46, 54, 200 };
-        DrawRectangle(x, hpY, pipW, pipH, fill);
-        DrawRectangleLines(x, hpY, pipW, pipH, (Color){ 20, 22, 26, 220 });
+        int x0 = hpX + i * (pipW + pipGap);
+        Color fill = (i < gState.hp) ? hex_color(0xd6453c, 255) : (Color){ 45, 48, 56, 190 };
+        for (int r = 0; r < 7; r++) {
+            for (int c = 0; c < 8; c++) {
+                if (HEART_PIX[r][c] == 'X') {
+                    DrawRectangle(x0 + c * px, hpY + r * px, px, px, fill);
+                }
+            }
+        }
     }
 
     int barY = hpY + pipH + 14;

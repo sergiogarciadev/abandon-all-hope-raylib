@@ -15,6 +15,7 @@ static float sTitleTime = 0.0f;
 static int sDeathWave = 1;
 static int sDeathKills = 0;
 static bool sDeathBest = false;
+static bool sShouldQuit = false;
 
 static Vector3 sSwoopPos0 = { 2.0f, 0.0f, 24.0f };
 static Vector3 sSwoopLook0 = { -1.5f, 2.2f, 8.0f };
@@ -137,6 +138,9 @@ void title_draw(void) {
         }
         if (ui_button((Rectangle){ bx, by + 128.0f, bw, bh }, "SETTINGS", false)) {
             title_set_screen(SCREEN_SETTINGS);
+        }
+        if (ui_button((Rectangle){ bx, by + 192.0f, bw, bh }, "QUIT", false)) {
+            sShouldQuit = true;
         }
         return;
     }
@@ -270,4 +274,8 @@ void title_draw(void) {
             if (sCbs.onQuitToTitle) sCbs.onQuitToTitle();
         }
     }
+}
+
+bool title_should_quit(void) {
+    return sShouldQuit;
 }
