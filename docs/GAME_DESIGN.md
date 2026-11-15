@@ -2,7 +2,7 @@
 
 **Genre:** 3D Top-Down Zombie Survival Shooter  
 **Engine & Language:** C11, Raylib 5.5, OpenGL 3.3 (GLSL 330), CMake + Ninja, LLVM (`clang` + `lld`)  
-**Asset Footprint:** **Zero external assets** — every 3D mesh, texture, particle, UI icon, sound effect, and musical note is procedurally generated at runtime.
+**Asset Footprint:** **Procedural 3D/Audio/Sprites** — every 3D mesh, texture, particle, UI icon, sound effect, and musical note is procedurally generated at runtime; only the 3 UI TrueType fonts (`Anton-Regular.ttf`, `Jersey25-Regular.ttf`, `JimNightshade-Regular.ttf`) are loaded from `assets/fonts/`.
 
 ---
 
@@ -184,6 +184,8 @@ A real-time D-minor / F-major chiptune step sequencer (`THEME`, `SOAR`, `OMEN`, 
 
 ## 8. UI, Menus & Persistence
 
-- **HUD (`src/ui/hud.c`):** Top-left `WAVE / KILLS / LEFT` panel, top-center **8×7 pixel-art heart HP pips**, active `2X DAMAGE` / `INF AMMO` timers, bottom-center magazine bullet pips & reload progress bar, wave omen banners, supply toasts, and crimson edge-vignette damage flash.
+- **Typography & Distressed Shader (`src/ui/fonts.c`):** Loads `Anton-Regular.ttf` (144px), `JimNightshade-Regular.ttf` (80px), and `Jersey25-Regular.ttf` (36px) from `assets/fonts/`. `font_draw_distressed()` applies a GLSL screen-space alpha mask (`DISTRESS_FS`) sampled from a `600×300` 4-octave fractal noise texture (`clamp(-9 * n + 6.58, 0, 1)`) for chipped-paint transparency on `ABANDON` (`57px`) / `ALL HOPE` (`144px`), `PAUSED` (`117px`), and `YOU DIED` (`132px`).
+- **HUD (`src/ui/hud.c`):** Top-left `WAVE / KILLS / LEFT` panel, top-center **8×7 pixel-art heart HP pips**, active `2X DAMAGE` / `INF AMMO` timers, bottom-center magazine bullet pips & reload progress bar, `Jim Nightshade` wave omen banners, supply toasts, and crimson edge-vignette damage flash.
+- **Upgrade Picker (`src/ui/upgrades.c`):** 2-tone (`X` solid / `o` dim) 8×8 pixel-art icons, `Jim Nightshade` `WAVE X CLEARED` header, `Anton` card titles, and `Jersey 25` descriptions.
 - **Menus (`src/ui/title.c`):** `SCREEN_TITLE` (`PLAY`, `HOW TO PLAY`, `SETTINGS`, `QUIT`), `SCREEN_PAUSED` (`RESUME`, `SETTINGS`, `QUIT TO TITLE`), and `SCREEN_DEAD` (`TRY AGAIN`, `QUIT TO TITLE`).
 - **Persistence (`src/core/storage.c`):** Saves `masterVol`, `musicVol`, `shake`, `muted`, `bestWave`, and `bestKills` to `aah_settings.cfg`.

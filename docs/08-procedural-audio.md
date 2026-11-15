@@ -16,12 +16,13 @@ SetAudioStreamCallback(stream, audio_callback);
 PlayAudioStream(stream);
 ```
 
-Because `audio_callback(void *bufferData, unsigned int frames)` runs on miniaudio's background audio thread while gameplay (`sfx_shot`, `music_update_state`, etc.) runs on the main thread, shared synth state (active voices, weather levels, ducking envelopes, music scheduler state) is guarded by a `pthread_mutex_t`:
+Because `audio_callback(void *bufferData, unsigned int frames)` runs on miniaudio's background audio thread while gameplay (`sfx_shot`, `music_update_state`, etc.) runs on the main thread, shared synth state (active voices, weather levels, ducking envelopes, music scheduler state) is guarded by a recursive mutex (`PTHREAD_MUTEX_RECURSIVE` initialized in `synth_init()`):
 
 ```c
-pthread_mutex_lock(&gAudioMutex);
-// Render `frames` stereo samples into `bufferData` (int16_t interleaved L/R)
-pthread_mutex_unlock(&gAudioMutex);
+pthread_mutex_lock(&gMutex);
+// Render `frames` stereo samples into `buffer` (short interleaved L/R)
+// Safe for gMusicTick() to re-enter synth_spawn() / synth_set_music_*()
+pthread_mutex_unlock(&gMutex);
 ```
 
 ---
