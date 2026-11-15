@@ -78,6 +78,26 @@ int main(void) {
 
 ---
 
-## Hands-On Example
+## Hands-On Example: [`ex01_window.c`](../examples/ex01_window.c)
 
-- [`examples/ex01_window.c`](../examples/ex01_window.c) — Minimal Raylib window, `GetFrameTime()` delta-time movement, and normalized diagonal input (`-DBUILD_LESSON_EXAMPLE=ex01_window`).
+Build and run this standalone example:
+```bash
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex01_window && cmake --build build --target ex01_window
+./build/ex01_window
+```
+
+Inside `ex01_window.c`, three core Raylib patterns drive every frame:
+
+1. **Clamped Delta Time** — prevents physics spikes if the window is dragged or pauses:
+   ```c
+   float dt = fminf(GetFrameTime(), 0.05f);
+   ```
+2. **Normalized Diagonal Movement** — prevents moving $\sqrt{2}$ faster when holding two keys (`W` + `D`):
+   ```c
+   float len = hypotf(mx, my);
+   if (len > 0.0f) {
+       pos.x += (mx / len) * speed * dt;
+       pos.y += (my / len) * speed * dt;
+   }
+   ```
+3. **Immediate-Mode Render Loop** — `BeginDrawing()` / `ClearBackground()` / `EndDrawing()` redraws the entire frame at 60 FPS (`SetTargetFPS(60)`).

@@ -27,5 +27,32 @@ The survivor's rig splits into two coordinated halves:
 
 ## Hands-On Examples
 
-- [`examples/ex04_gait_cycle.c`](../examples/ex04_gait_cycle.c) — Asymmetric `foot_cycle()` stance/swing gait curve and pelvis bob (`-DBUILD_LESSON_EXAMPLE=ex04_gait_cycle`).
-- [`examples/ex04_two_bone_ik.c`](../examples/ex04_two_bone_ik.c) — Interactive 3D two-bone inverse kinematics (`ik2`) with pole vector (`-DBUILD_LESSON_EXAMPLE=ex04_two_bone_ik`).
+### 1. Asymmetric Gait Cycle: [`ex04_gait_cycle.c`](../examples/ex04_gait_cycle.c)
+```bash
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex04_gait_cycle && cmake --build build --target ex04_gait_cycle
+./build/ex04_gait_cycle
+```
+Visualizes `foot_cycle(p, beta)` with `beta = 0.62` (62% planted stance, 38% lifted swing):
+```c
+if (p < beta) {
+    float u = p / beta;
+    return (FootPose){ 0.5f - u, 0.0f, 0.0f }; // planted foot slides backward
+}
+float u = (p - beta) / (1.0f - beta);
+return (FootPose){ -0.5f + 0.5f * (1.0f - cosf(PI * u)), sinf(PI * u), 0.35f * sinf(2.0f * PI * u) };
+```
+The two legs run `0.5` out of phase while `bob = -12.0f * cosf(2.0f * (phase * 2.0f * PI - PI * beta))` drives the double-frequency hip bounce.
+
+### 2. Interactive 3D Two-Bone IK: [`ex04_two_bone_ik.c`](../examples/ex04_two_bone_ik.c)
+```bash
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex04_two_bone_ik && cmake --build build --target ex04_two_bone_ik
+./build/ex04_two_bone_ik
+```
+Move the red target with `WASD` + `Q/E` to watch `ik2(shoulder, target, l1, l2, pole)` solve the elbow joint using the Law of Cosines:
+```c
+float cosA = Clamp((l1 * l1 + d * d - l2 * l2) / (2.0f * l1 * d), -1.0f, 1.0f);
+float sinA = sqrtf(fmaxf(0.0f, 1.0f - cosA * cosA));
+Vector3 bend = Vector3Normalize(Vector3Subtract(pole, Vector3Scale(dir, Vector3DotProduct(pole, dir))));
+return Vector3Add(a, Vector3Add(Vector3Scale(dir, l1 * cosA), Vector3Scale(bend, l1 * sinA)));
+```
+Projecting `pole` perpendicular to `dir` guarantees the knee or elbow always bends in a natural anatomical direction.

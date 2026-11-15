@@ -37,5 +37,26 @@ Using `BlockBatch`, `world_init()` constructs:
 
 ## Hands-On Examples
 
-- [`examples/ex03_chamfered_mesh.c`](../examples/ex03_chamfered_mesh.c) — Procedural 45° chamfered cuboid mesh with baked vertex colors (`-DBUILD_LESSON_EXAMPLE=ex03_chamfered_mesh`).
-- [`examples/ex03_dijkstra_grid.c`](../examples/ex03_dijkstra_grid.c) — Interactive Dijkstra shortest-path routing around rectangular obstacles (`-DBUILD_LESSON_EXAMPLE=ex03_dijkstra_grid`).
+### 1. Procedural 45° Chamfered Block: [`ex03_chamfered_mesh.c`](../examples/ex03_chamfered_mesh.c)
+```bash
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex03_chamfered_mesh && cmake --build build --target ex03_chamfered_mesh
+./build/ex03_chamfered_mesh
+```
+Shows how `src/core/blocks.c` builds crisp chamfered geometry in memory without `.obj` files:
+```c
+Vector3 n = Vector3Normalize(Vector3CrossProduct(Vector3Subtract(pb, pa), Vector3Subtract(pc, pa)));
+m.vertices[v * 3 + 0] = pts[k].x; /* ... */
+m.normals[v * 3 + 0]  = n.x;      /* flat-shaded face normal */
+m.colors[v * 4 + 0]   = col.r;    /* baked per-vertex color */
+```
+After filling 6 main faces, 12 edge chamfers, and 8 corner triangles (44 triangles total), `UploadMesh(&m, false)` sends the mesh to the GPU once.
+
+### 2. Dijkstra Waypoint Routing: [`ex03_dijkstra_grid.c`](../examples/ex03_dijkstra_grid.c)
+```bash
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex03_dijkstra_grid && cmake --build build --target ex03_dijkstra_grid
+./build/ex03_dijkstra_grid
+```
+Demonstrates the exact waypoint-graph pattern from `src/world/solids.c`:
+- Places 4 padded corner nodes around each rectangular obstacle.
+- Connects any two nodes where `clear_line(pts[u], pts[v])` does not intersect any box.
+- Runs Dijkstra from `start` to `goal` (Left-click to move Goal, Right-click to move Start) and draws the shortest unobstructed path.

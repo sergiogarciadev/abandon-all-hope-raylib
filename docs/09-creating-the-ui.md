@@ -77,5 +77,20 @@ Rather than a static background, the title screen (`SCREEN_TITLE`) renders the l
 
 ## Hands-On Examples
 
-- [`examples/ex09_pixel_icons_hud.c`](../examples/ex09_pixel_icons_hud.c) — 8×7 pixel-art heart HP pips and 2-tone (`X`/`o`) 8×8 upgrade cards (`-DBUILD_LESSON_EXAMPLE=ex09_pixel_icons_hud`).
-- [`examples/ex09_distressed_ui.c`](../examples/ex09_distressed_ui.c) — Custom TTF font loading and 4-octave fractal-noise `DISTRESS_FS` shader over live 3D (`-DBUILD_LESSON_EXAMPLE=ex09_distressed_ui`).
+### 1. Pixel-Art Hearts & 2-Tone Upgrade Cards: [`ex09_pixel_icons_hud.c`](../examples/ex09_pixel_icons_hud.c)
+```bash
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex09_pixel_icons_hud && cmake --build build --target ex09_pixel_icons_hud
+./build/ex09_pixel_icons_hud
+```
+Shows how `draw_grid_icon()` renders both the `8×7` `HEART` pips and `8×8` upgrade icons from compact ASCII bitmaps (`'X'` = full color, `'o'` = `alpha 95` dim):
+```c
+if (rows[r][c] == 'X') DrawRectangle(x0 + c * px, y0 + r * px, px, px, col);
+else if (rows[r][c] == 'o') DrawRectangle(x0 + c * px, y0 + r * px, px, px, dim);
+```
+
+### 2. Custom Fonts & Distressed Alpha-Mask Shader: [`ex09_distressed_ui.c`](../examples/ex09_distressed_ui.c)
+```bash
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex09_distressed_ui && cmake --build build --target ex09_distressed_ui
+./build/ex09_distressed_ui
+```
+Builds the `600×300` 4-octave fractal-noise grit texture (`Clamp(-9.0f * (sum / norm) + 6.58f, 0.0f, 1.0f)`) and applies `DISTRESS_FS` over `DrawTextEx(anton, "ALL HOPE", ...)` while a 3D cube orbits behind it — proving the chipped-paint holes are genuinely transparent.

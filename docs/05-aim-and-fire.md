@@ -34,6 +34,23 @@ Bullets travel at `38 units/second`. At 30 FPS (`dt = 0.033s`), a single step is
 
 ---
 
-## Hands-On Example
+## Hands-On Example: [`ex05_raycast_aim.c`](../examples/ex05_raycast_aim.c)
 
-- [`examples/ex05_raycast_aim.c`](../examples/ex05_raycast_aim.c) — Mouse raycast aiming onto `y = 0.9`, tracer bullets, and ejecting brass casings (`-DBUILD_LESSON_EXAMPLE=ex05_raycast_aim`).
+```bash
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex05_raycast_aim && cmake --build build --target ex05_raycast_aim
+./build/ex05_raycast_aim
+```
+
+Combines the three core shooting mechanics from `src/entities/weapon.c`:
+
+1. **Mouse Ray-Plane Intersection (`y = 0.9`)** — turns 2D cursor coordinates into a 3D world aim point and yaw angle:
+   ```c
+   Ray ray = GetScreenToWorldRay(GetMousePosition(), cam);
+   float t = (0.9f - ray.position.y) / ray.direction.y;
+   if (t > 0.0f) {
+       aimPt = Vector3Add(ray.position, Vector3Scale(ray.direction, t));
+       yaw = atan2f(aimPt.x, aimPt.z);
+   }
+   ```
+2. **Tracer Bullets** — advance along `dir` at `36.0f * dt` and render as additive/gold cylinders (`DrawCylinderEx`).
+3. **Ejected Brass Casings** — spawn with rightward + upward velocity (`right * 3.0f`, `vy = 3.2f`), fall under gravity (`-18.0f * dt`), and bounce on `y = 0.03f` with `vel.y *= -0.35f`.

@@ -30,6 +30,21 @@ Drops outside the cabin automatically slide inward so the player can always reac
 
 ---
 
-## Hands-On Example
+## Hands-On Example: [`ex07_storm_weather.c`](../examples/ex07_storm_weather.c)
 
-- [`examples/ex07_storm_weather.c`](../examples/ex07_storm_weather.c) — Rain streaks, ground splash rings, and double-exponential lightning flash (`-DBUILD_LESSON_EXAMPLE=ex07_storm_weather`).
+```bash
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex07_storm_weather && cmake --build build --target ex07_storm_weather
+./build/ex07_storm_weather
+```
+
+Press `[SPACE]` to trigger the double-exponential lightning flash from `src/world/weather.c`:
+
+```c
+if (flashT >= 0.0f) {
+    flashT += dt;
+    flash = expf(-flashT * 14.0f) + (flashT > 0.13f ? 0.8f * expf(-(flashT - 0.13f) * 9.0f) : 0.0f);
+    if (flashT > 1.2f) flashT = -1.0f;
+}
+```
+1. **Double Flash:** A sharp initial spike (`exp(-14t)`) followed `0.13s` later by a secondary stroke (`0.8 * exp(-9(t - 0.13))`) modulates the sky/fog color.
+2. **Recycled Rain & Splashes:** `900` rain streaks wrap around `y < 0` and `80` ground splash rings (`DrawCircle3D`) expand and fade out over `0.35s`.

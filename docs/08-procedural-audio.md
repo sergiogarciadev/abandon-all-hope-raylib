@@ -98,6 +98,20 @@ Rather than looping a static track, `music_update_state(wave, alive, lowHp, dt)`
 
 ---
 
-## Hands-On Example
+## Hands-On Example: [`ex08_procedural_synth.c`](../examples/ex08_procedural_synth.c)
 
-- [`examples/ex08_procedural_synth.c`](../examples/ex08_procedural_synth.c) — `AudioStream` callback with `PTHREAD_MUTEX_RECURSIVE`, 15-bit LFSR noise, SVF filter, and interactive SFX/chord keys `1–4` (`-DBUILD_LESSON_EXAMPLE=ex08_procedural_synth`).
+```bash
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex08_procedural_synth && cmake --build build --target ex08_procedural_synth
+./build/ex08_procedural_synth
+```
+
+A complete 150-line procedural synth matching `src/audio/synth.c` and `sfx_shot()` in `src/audio/sfx.c`:
+
+1. **15-Bit LFSR Noise** — generates both a long noise buffer and a 93-step metallic loop for gunshots:
+   ```c
+   uint16_t bit = (uint16_t)((lfsr ^ (lfsr >> 1)) & 1u);
+   lfsr = (uint16_t)((lfsr >> 1) | (bit << 14));
+   gNoiseLong[i] = (lfsr & 1u) ? 1.0f : -1.0f;
+   ```
+2. **Layered Gunshots & Rapid Fire** — holding `[1]` or Left Mouse repeats `play_shot()` every `0.13s` (`fireRate`), layering a `W_PULSE25` pitch sweep (`850 Hz` when `[D]` Double Damage is ON, `680 Hz` normal), metallic bandpass noise, lowpass noise tail, sine punch, and optional `[S]` Buckshot spread layer.
+3. **Dotted-8th Echo & Limiter** — voices feed `gEcho[ECHO_LEN]` (`0.375s` at `44100 Hz`) and pass through `tanhf()` before 16-bit PCM output. Press `[2]` for zombie groan, `[3]` for glass shatter, and `[4]` for a D-minor arpeggio.

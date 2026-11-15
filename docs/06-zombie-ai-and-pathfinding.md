@@ -31,6 +31,29 @@ Finally, `zombies_separate()` pushes overlapping zombies apart (`Z_SPACE = 0.8`)
 
 ---
 
-## Hands-On Example
+## Hands-On Example: [`ex06_zombie_ai.c`](../examples/ex06_zombie_ai.c)
 
-- [`examples/ex06_zombie_ai.c`](../examples/ex06_zombie_ai.c) — Zombie AI state machine (`CHASE` → `BASH WINDOW` → `CLIMBING OVER SILL`) (`-DBUILD_LESSON_EXAMPLE=ex06_zombie_ai`).
+```bash
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex06_zombie_ai && cmake --build build --target ex06_zombie_ai
+./build/ex06_zombie_ai
+```
+
+Demonstrates the finite-state machine used in `src/entities/zombies.c` (`AI_CHASE` → `AI_BASH` → `AI_CLIMB`):
+
+```c
+} else if (st == AI_BASH) {
+    timer += dt;
+    if (timer >= 0.7f) {
+        timer = 0.0f;
+        winHp--;
+        if (winHp <= 0) st = AI_CLIMB;
+    }
+} else if (st == AI_CLIMB) {
+    timer += dt;
+    float u = fminf(1.0f, timer / 1.2f);
+    zPos.z = 1.0f - 2.2f * u;
+    zPos.y = sinf(u * PI) * 1.15f; // Arc over window sill
+    if (u >= 1.0f) { zPos.y = 0.0f; st = AI_CHASE; }
+}
+```
+Notice how `sinf(u * PI)` smoothly lifts the zombie over the window sill before dropping it back to `y = 0` inside the cabin to resume `AI_CHASE`. Press `[R]` to reset the window and zombie.

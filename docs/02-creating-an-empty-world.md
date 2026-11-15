@@ -37,6 +37,21 @@ With `ClearBackground(gScene.fogColor)` and our fog shader, the ground fades sea
 
 ---
 
-## Hands-On Example
+## Hands-On Example: [`ex02_empty_world.c`](../examples/ex02_empty_world.c)
 
-- [`examples/ex02_empty_world.c`](../examples/ex02_empty_world.c) — Top-down 3D camera, orbiting point light, directional moonlight, and GLSL 330 distance fog shader (`-DBUILD_LESSON_EXAMPLE=ex02_empty_world`).
+Build and run:
+```bash
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex02_empty_world && cmake --build build --target ex02_empty_world
+./build/ex02_empty_world
+```
+
+Key pieces demonstrated in `ex02_empty_world.c`:
+
+1. **Fragment Lighting + Distance Fog (`FS`)** — combines directional moonlight, an orbiting point light (`att = 1.0 / (1.0 + 0.08 * d * d)`), and camera-distance fog:
+   ```glsl
+   vec3 lit = fragColor.rgb * (vec3(0.14, 0.17, 0.24) + vec3(0.45, 0.55, 0.78) * diff + vec3(1.0, 0.65, 0.3) * pDiff);
+   float fog = clamp((length(viewPos - fragPos) - fogNear) / (fogFar - fogNear), 0.0, 1.0);
+   finalColor = vec4(mix(lit, fogColor, fog), fragColor.a);
+   ```
+2. **Updating Uniforms Per Frame** — `SetShaderValue()` uploads `viewPos` and the orbiting `lightPos` before `BeginMode3D(cam)`.
+3. **Top-Down Perspective Camera** — `position = { 0, 22, 12 }`, `target = { 0, 0, 0 }`, `fovy = 55.0f` gives the exact 3/4 overhead framing used in the full game (`src/core/scene.c`).
