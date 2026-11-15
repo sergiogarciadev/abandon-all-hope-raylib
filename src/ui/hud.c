@@ -1,4 +1,5 @@
 #include "hud.h"
+#include "fonts.h"
 #include "core/state.h"
 #include "core/storage.h"
 #include "core/math_util.h"
@@ -165,17 +166,19 @@ void hud_draw(void) {
     DrawText(hintRight, sw - hrw - 20, sh - 28, 15,
              gSettings.muted ? hex_color(0xd6453c, 220) : (Color){ 170, 180, 195, 190 });
 
-    // Wave Banner (top-center)
+    // Wave Banner (top-center) — Jim Nightshade horror script
     if (sBannerT > 0.0f) {
         float fade = clampf(sBannerT / 0.5f, 0.0f, 1.0f);
         if (sBannerT > 2.2f) fade = clampf((2.6f - sBannerT) / 0.4f, 0.0f, 1.0f);
         uint8_t a = (uint8_t)(fade * 255.0f);
-        int bw = MeasureText(sBannerTitle, 34);
-        int sw2 = MeasureText(sBannerSub, 18);
-        int y = 94;
-        DrawText(sBannerTitle, (sw - bw) / 2, y, 34, (Color){ 232, 210, 138, a });
+        float bw = font_measure(gFontNightshade, sBannerTitle, 64.0f, 5.0f);
+        float sw2 = font_measure(gFontJersey, sBannerSub, 20.0f, 3.0f);
+        float y = 86.0f;
+        font_draw_shadow(gFontNightshade, sBannerTitle, ((float)sw - bw) * 0.5f, y, 64.0f, 5.0f,
+                         (Color){ 214, 69, 60, a }, (Color){ 0, 0, 0, a }, 3.0f);
         if (sBannerSub[0] != '\0') {
-            DrawText(sBannerSub, (sw - sw2) / 2, y + 40, 18, (Color){ 195, 205, 220, a });
+            font_draw(gFontJersey, sBannerSub, ((float)sw - sw2) * 0.5f, y + 66.0f, 20.0f, 3.0f,
+                      (Color){ 180, 190, 205, a });
         }
     }
 

@@ -15,6 +15,7 @@
 #include "audio/synth.h"
 #include "audio/sfx.h"
 #include "audio/music.h"
+#include "ui/fonts.h"
 #include "ui/hud.h"
 #include "ui/upgrades.h"
 #include "ui/title.h"
@@ -152,6 +153,7 @@ void game_init(void) {
     zombies_init();
     drops_init();
     weapon_clear();
+    fonts_init();
     hud_init();
 
     synth_init();
@@ -358,6 +360,7 @@ void game_draw(void) {
 }
 
 void game_cleanup(void) {
+    fonts_cleanup();
     synth_cleanup();
     drops_cleanup();
     zombies_cleanup();

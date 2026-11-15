@@ -36,6 +36,7 @@ add_executable(abandon_all_hope
   src/audio/synth.c
   src/audio/sfx.c
   src/audio/music.c
+  src/ui/fonts.c
   src/ui/hud.c
   src/ui/upgrades.c
   src/ui/title.c
@@ -44,6 +45,11 @@ add_executable(abandon_all_hope
 
 target_include_directories(abandon_all_hope PRIVATE src)
 target_link_libraries(abandon_all_hope PRIVATE raylib m pthread)
+
+add_custom_command(TARGET abandon_all_hope POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+  ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:abandon_all_hope>/assets
+)
 
 if(CMAKE_C_COMPILER_ID MATCHES "Clang")
   target_compile_options(abandon_all_hope PRIVATE -Wall -Wextra -Wno-missing-braces)

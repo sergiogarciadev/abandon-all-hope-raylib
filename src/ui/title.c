@@ -1,4 +1,5 @@
 #include "title.h"
+#include "fonts.h"
 #include "core/storage.h"
 #include "core/scene.h"
 #include "core/math_util.h"
@@ -62,9 +63,9 @@ static bool ui_button(Rectangle r, const char *label, bool primary) {
     DrawRectangleRounded(r, 0.14f, 6, bg);
     DrawRectangleRoundedLinesEx(r, 0.14f, 6, hover ? 2.0f : 1.0f, border);
 
-    int tw = MeasureText(label, 20);
-    DrawText(label, (int)(r.x + (r.width - (float)tw) * 0.5f), (int)(r.y + (r.height - 20.0f) * 0.5f),
-             20, RAYWHITE);
+    float tw = font_measure(gFontAnton, label, 24.0f, 2.0f);
+    font_draw(gFontAnton, label, r.x + (r.width - tw) * 0.5f, r.y + (r.height - 24.0f) * 0.5f,
+              24.0f, 2.0f, RAYWHITE);
     return false;
 }
 
@@ -113,18 +114,25 @@ void title_draw(void) {
     if (gScreen == SCREEN_TITLE) {
         DrawRectangle(0, 0, sw, sh, (Color){ 4, 6, 10, 120 });
 
-        const char *title = "ABANDON ALL HOPE";
-        int tw = MeasureText(title, 54);
-        DrawText(title, (sw - tw) / 2, sh / 2 - 190, 54, hex_color(0xd6453c, 255));
+        const char *titleTop = "ABANDON";
+        const char *titleMain = "ALL HOPE";
+        float ttw = font_measure(gFontAnton, titleTop, 38.0f, 10.0f);
+        float tmw = font_measure(gFontAnton, titleMain, 96.0f, 4.0f);
+        font_draw_distressed(gFontAnton, titleTop, ((float)sw - ttw) * 0.5f, (float)sh * 0.5f - 235.0f,
+                             38.0f, 10.0f, hex_color(0xe9e2d6, 255), 11u);
+        font_draw_distressed(gFontAnton, titleMain, ((float)sw - tmw) * 0.5f, (float)sh * 0.5f - 196.0f,
+                             96.0f, 4.0f, hex_color(0xd6453c, 255), 29u);
 
         const char *sub = "HOLD THE CABIN. SURVIVE THE NIGHT.";
-        int suw = MeasureText(sub, 18);
-        DrawText(sub, (sw - suw) / 2, sh / 2 - 124, 18, hex_color(0xe8d28a, 230));
+        float suw = font_measure(gFontJersey, sub, 20.0f, 2.5f);
+        font_draw(gFontJersey, sub, ((float)sw - suw) * 0.5f, (float)sh * 0.5f - 102.0f,
+                  20.0f, 2.5f, hex_color(0xe8d28a, 230));
 
         if (gSettings.bestKills > 0) {
             const char *best = TextFormat("BEST NIGHT: WAVE %d  ·  %d KILLS", gSettings.bestWave, gSettings.bestKills);
-            int bw = MeasureText(best, 16);
-            DrawText(best, (sw - bw) / 2, sh / 2 - 88, 16, (Color){ 175, 188, 205, 220 });
+            float bwBest = font_measure(gFontJersey, best, 18.0f, 2.0f);
+            font_draw(gFontJersey, best, ((float)sw - bwBest) * 0.5f, (float)sh * 0.5f - 72.0f,
+                      18.0f, 2.0f, (Color){ 175, 188, 205, 220 });
         }
 
         float bw = 260.0f, bh = 48.0f, bx = ((float)sw - bw) * 0.5f;
@@ -235,7 +243,9 @@ void title_draw(void) {
     if (gScreen == SCREEN_PAUSED) {
         DrawRectangle(0, 0, sw, sh, (Color){ 6, 8, 12, 175 });
         const char *hdr = "PAUSED";
-        DrawText(hdr, (sw - MeasureText(hdr, 42)) / 2, sh / 2 - 140, 42, hex_color(0xe8d28a, 255));
+        float hw = font_measure(gFontAnton, hdr, 78.0f, 8.0f);
+        font_draw_distressed(gFontAnton, hdr, ((float)sw - hw) * 0.5f, (float)sh * 0.5f - 175.0f,
+                             78.0f, 8.0f, hex_color(0xe9e2d6, 255), 53u);
 
         float bw = 240.0f, bh = 46.0f, bx = ((float)sw - bw) * 0.5f;
         float by = (float)sh * 0.5f - 62.0f;
@@ -254,16 +264,21 @@ void title_draw(void) {
     if (gScreen == SCREEN_DEAD) {
         DrawRectangle(0, 0, sw, sh, (Color){ 18, 4, 6, 185 });
         const char *hdr = "YOU DIED";
-        DrawText(hdr, (sw - MeasureText(hdr, 52)) / 2, sh / 2 - 160, 52, hex_color(0xd6453c, 255));
+        float hw = font_measure(gFontAnton, hdr, 88.0f, 8.0f);
+        font_draw_distressed(gFontAnton, hdr, ((float)sw - hw) * 0.5f, (float)sh * 0.5f - 196.0f,
+                             88.0f, 8.0f, hex_color(0xb8332b, 255), 71u);
 
         const char *stats = TextFormat("YOU REACHED WAVE %d  ·  %d KILLS", sDeathWave, sDeathKills);
-        DrawText(stats, (sw - MeasureText(stats, 22)) / 2, sh / 2 - 90, 22, RAYWHITE);
+        float stw = font_measure(gFontJersey, stats, 24.0f, 3.0f);
+        font_draw(gFontJersey, stats, ((float)sw - stw) * 0.5f, (float)sh * 0.5f - 94.0f,
+                  24.0f, 3.0f, hex_color(0xd6453c, 255));
 
         const char *bestTxt = sDeathBest
             ? "NEW BEST NIGHT!"
             : TextFormat("BEST: WAVE %d  ·  %d KILLS", gSettings.bestWave, gSettings.bestKills);
-        DrawText(bestTxt, (sw - MeasureText(bestTxt, 18)) / 2, sh / 2 - 56, 18,
-                 sDeathBest ? hex_color(0xe8d28a, 255) : (Color){ 175, 185, 200, 220 });
+        float btw = font_measure(gFontJersey, bestTxt, 19.0f, 3.0f);
+        font_draw(gFontJersey, bestTxt, ((float)sw - btw) * 0.5f, (float)sh * 0.5f - 58.0f,
+                  19.0f, 3.0f, sDeathBest ? hex_color(0xe8d28a, 255) : (Color){ 175, 185, 200, 220 });
 
         float bw = 240.0f, bh = 46.0f, bx = ((float)sw - bw) * 0.5f;
         float by = (float)sh * 0.5f + 4.0f;

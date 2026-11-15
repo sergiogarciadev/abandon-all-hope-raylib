@@ -1,4 +1,5 @@
 #include "upgrades.h"
+#include "fonts.h"
 #include "core/state.h"
 #include "core/math_util.h"
 #include "audio/sfx.h"
@@ -302,15 +303,16 @@ void upgrades_draw(void) {
     DrawRectangle(0, 0, sw, sh, (Color){ 6, 8, 12, 185 });
 
     const char *hdr = TextFormat("WAVE %d CLEARED", gState.wave);
-    int hw = MeasureText(hdr, 28);
-    DrawText(hdr, (sw - hw) / 2, sh / 2 - 205, 28, hex_color(0xe8d28a, 255));
+    float hw = font_measure(gFontNightshade, hdr, 58.0f, 5.0f);
+    font_draw_shadow(gFontNightshade, hdr, ((float)sw - hw) * 0.5f, (float)sh * 0.5f - 232.0f, 58.0f, 5.0f,
+                     hex_color(0xd6453c, 255), BLACK, 3.0f);
 
     const char *sub = sHealed
         ? "+1 HEALTH  ·  CHOOSE ONE  ([1] [2] [3])"
         : "CHOOSE ONE  ([1] [2] [3])";
-    int suw = MeasureText(sub, 16);
-    DrawText(sub, (sw - suw) / 2, sh / 2 - 168, 16,
-             sHealed ? hex_color(0x8fae6b, 255) : (Color){ 175, 185, 200, 220 });
+    float suw = font_measure(gFontJersey, sub, 18.0f, 3.0f);
+    font_draw(gFontJersey, sub, ((float)sw - suw) * 0.5f, (float)sh * 0.5f - 170.0f, 18.0f, 3.0f,
+              sHealed ? hex_color(0x8fae6b, 255) : (Color){ 175, 185, 200, 220 });
 
     for (int i = 0; i < sChoiceCount; i++) {
         int idx = sChoices[i];
@@ -339,13 +341,15 @@ void upgrades_draw(void) {
         // 8x8 pixel icon
         draw_pixel_icon(u->icon, (int)(r.x + r.width * 0.5f), (int)r.y + 84, 7, catCol);
 
-        // Upgrade name
-        int nw = MeasureText(u->name, 20);
-        DrawText(u->name, (int)(r.x + (r.width - (float)nw) * 0.5f), (int)r.y + 144, 20, RAYWHITE);
+        // Upgrade name (Anton)
+        float nw = font_measure(gFontAnton, u->name, 26.0f, 1.5f);
+        font_draw_shadow(gFontAnton, u->name, r.x + (r.width - nw) * 0.5f, r.y + 142.0f, 26.0f, 1.5f,
+                         hex_color(0xe9e2d6, 255), BLACK, 2.0f);
 
-        // Description
-        int dw = MeasureText(u->desc, 15);
-        DrawText(u->desc, (int)(r.x + (r.width - (float)dw) * 0.5f), (int)r.y + 178, 15, (Color){ 185, 195, 210, 255 });
+        // Description (Jersey 25)
+        float dw = font_measure(gFontJersey, u->desc, 17.0f, 0.5f);
+        font_draw(gFontJersey, u->desc, r.x + (r.width - dw) * 0.5f, r.y + 178.0f, 17.0f, 0.5f,
+                  (Color){ 185, 195, 210, 255 });
 
         // Rank info / key hint
         const char *rank = (u->maxLevel == INT_MAX)
