@@ -8,6 +8,7 @@
 #include "world/solids.h"
 #include "world/world.h"
 #include "effects/particles.h"
+#include "entities/drops.h"
 #include "raymath.h"
 #include <math.h>
 #include <string.h>
@@ -456,6 +457,7 @@ static void climb_step(Zombie *z, float dt) {
 void zombies_kill(Zombie *z, Vector3 dir) {
     if (z->climb >= 0.0f) end_climb(z, true);
     spawn_blood(z->pos);
+    drops_maybe_spawn(z->pos);
 
     int slot = -1;
     for (int i = 0; i < MAX_CORPSES; i++) {

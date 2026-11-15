@@ -6,10 +6,12 @@
 #include "core/state.h"
 #include "world/world.h"
 #include "world/openings.h"
+#include "world/weather.h"
 #include "effects/particles.h"
 #include "entities/player.h"
 #include "entities/weapon.h"
 #include "entities/zombies.h"
+#include "entities/drops.h"
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
@@ -18,12 +20,14 @@ int main(void) {
 
     state_reset_stats();
     gState.running = true;
-    gState.toSpawn = 8;
     scene_init();
     world_init();
+    weather_init();
+    weather_set(0.75f); // Preview storm in Step 7
     effects_init();
     player_init();
     zombies_init();
+    drops_init();
     weapon_clear();
 
     Vector3 aimPoint = { 0.0f, 0.9f, 5.0f };
@@ -63,6 +67,8 @@ int main(void) {
             gState.reloadT += dt;
             if (gState.reloadT >= gState.reloadTime) weapon_finish_reload();
         }
+        gState.pDamage = fmaxf(0.0f, gState.pDamage - dt);
+        gState.pAmmo = fmaxf(0.0f, gState.pAmmo - dt);
 
         gState.spawnTimer -= dt;
         if (gState.spawnTimer <= 0.0f && gZombieCount < 10) {
@@ -72,12 +78,14 @@ int main(void) {
 
         weapon_update_bullets(dt);
         zombies_update(dt, true, false);
+        drops_update(dt);
         effects_update(dt);
+        weather_update(dt, true);
 
         float inv = dt > 0.0f ? 1.0f / dt : 0.0f;
         player_animate(dt, (gPlayer.position.x - px) * inv, (gPlayer.position.z - pz) * inv);
 
-        world_update(dt, 0.0f);
+        world_update(dt, gWeather.level);
         update_openings(dt);
 
         gScene.camera.target = gPlayer.position;
@@ -97,16 +105,17 @@ int main(void) {
         world_draw(gPlayer.position);
         player_draw();
         zombies_draw();
+        drops_draw();
         weapon_draw_bullets();
         effects_draw();
+        weather_draw();
         EndMode3D();
 
-        DrawText(TextFormat("Step 6: Zombie AI & Pathfinding | KILLS: %d | ALIVE: %d",
-                            gState.kills, gZombieCount),
-                 20, 20, 20, RAYWHITE);
+        DrawText(TextFormat("Step 7: Weather, Debris & Drops | KILLS: %d", gState.kills), 20, 20, 20, RAYWHITE);
         EndDrawing();
     }
 
+    drops_cleanup();
     zombies_cleanup();
     player_cleanup();
     effects_cleanup();

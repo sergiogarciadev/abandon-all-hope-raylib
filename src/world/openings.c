@@ -1,6 +1,8 @@
 #include "openings.h"
 #include "core/math_util.h"
 #include "core/scene.h"
+#include "effects/particles.h"
+#include "raymath.h"
 #include <math.h>
 #include <float.h>
 #include <stddef.h>
@@ -243,7 +245,11 @@ void hit_opening(Opening *o) {
     if (!o || o->hp <= 0) return;
     o->hp--;
     o->jolt = 1.0f;
-    if (o->kind == OPENING_WINDOW && o->hp > 0) {
+    if (o->kind == OPENING_DOOR) {
+        Vector3 into = Vector3Normalize((Vector3){ o->ix - o->x, 0, o->iz - o->z });
+        spawn_opening_burst((Vector3){ o->x, 0, o->z }, into, o->w, true, o->sill, o->head,
+                            2, DEBRIS_WOOD, 0.12f, 2.0f);
+    } else if (o->hp > 0) {
         o->glassCracked = true;
     }
     if (o->hp <= 0) break_opening(o);
@@ -252,12 +258,17 @@ void hit_opening(Opening *o) {
 void break_opening(Opening *o) {
     if (!o) return;
     o->hp = 0;
+    Vector3 into = Vector3Normalize((Vector3){ o->ix - o->x, 0, o->iz - o->z });
     if (o->kind == OPENING_DOOR) {
         o->fallT = 0.0f;
         o->leafRotY = 0.0f;
+        spawn_opening_burst((Vector3){ o->x, 0, o->z }, into, o->w, true, o->sill, o->head,
+                            9, DEBRIS_WOOD, 0.16f, 3.5f);
     } else {
         o->glassVisible = false;
         o->barsVisible = false;
         o->shardsVisible = true;
+        spawn_opening_burst((Vector3){ o->x, 0, o->z }, into, o->w, false, o->sill, o->head,
+                            16, DEBRIS_GLASS, 0.09f, 4.0f);
     }
 }

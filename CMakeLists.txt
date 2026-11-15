@@ -25,11 +25,13 @@ add_executable(abandon_all_hope
   src/world/solids.c
   src/world/openings.c
   src/world/world.c
+  src/world/weather.c
   src/effects/particles.c
   src/entities/animation.c
   src/entities/player.c
   src/entities/weapon.c
   src/entities/zombies.c
+  src/entities/drops.c
 )
 
 target_include_directories(abandon_all_hope PRIVATE src)
