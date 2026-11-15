@@ -4,6 +4,7 @@
 #include "core/math_util.h"
 #include "core/scene.h"
 #include "core/state.h"
+#include "effects/particles.h"
 #include "rlgl.h"
 #include <math.h>
 
@@ -309,12 +310,20 @@ void player_animate(float dt, float mx, float mz) {
     gPlayer.muzzleWorldPos = xform_pt((Vector3){ 0.0f, 0.03f, 1.47f }, gPlayer.mGun);
 
     // Magazine
+    if (!gState.reloading || u < 0.12f) gPlayer.magDropped = false;
     float magDrop = 0.0f;
     if (gState.reloading && u >= 0.12f && u < 0.22f) magDrop = 0.24f * ease_smooth((u - 0.12f) / 0.1f);
     if (gState.reloading && u >= 0.78f) magDrop = 0.2f * (1.0f - ease_smooth(fminf(1.0f, (u - 0.78f) / 0.17f)));
     gPlayer.magVisible = !gState.reloading || u < 0.22f || u >= 0.78f;
     Matrix mMagLocal = make_transform_yxz(0.0f, -0.14f - magDrop, 0.52f, 0.0f, 0.0f, 0.0f);
     gPlayer.mMag = MatrixMultiply(mMagLocal, gPlayer.mGun);
+    if (gState.reloading && u >= 0.22f && !gPlayer.magDropped) {
+        gPlayer.magDropped = true;
+        Vector3 mp = { gPlayer.mMag.m12, gPlayer.mMag.m13, gPlayer.mMag.m14 };
+        spawn_debris(DEBRIS_MAG, mp, (Vector3){ 0, -1.0f, 0 },
+                     (Vector3){ 0, gPlayer.rotY, 0 }, (Vector3){ 3.0f, 0.0f, 2.0f },
+                     (Vector3){ 0.09f, 0.24f, 0.12f }, 4.0f, 0.05f);
+    }
 
     // Arms (two-bone IK)
     Vector3 gR = xform_pt(GRIP_R, mGunLocal);

@@ -5,7 +5,9 @@
 #include "core/state.h"
 #include "world/world.h"
 #include "world/openings.h"
+#include "effects/particles.h"
 #include "entities/player.h"
+#include "entities/weapon.h"
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
@@ -13,9 +15,14 @@ int main(void) {
     SetTargetFPS(60);
 
     state_reset_stats();
+    gState.running = true;
     scene_init();
     world_init();
+    effects_init();
     player_init();
+    weapon_clear();
+
+    Vector3 aimPoint = { 0.0f, 0.9f, 5.0f };
 
     while (!WindowShouldClose()) {
         float dt = fminf(GetFrameTime(), 0.05f);
@@ -39,11 +46,22 @@ int main(void) {
         if (fabsf(ray.direction.y) > 1e-5f) {
             float t = (0.9f - ray.position.y) / ray.direction.y;
             if (t > 0.0f) {
-                float ax = ray.position.x + ray.direction.x * t;
-                float az = ray.position.z + ray.direction.z * t;
-                gPlayer.rotY = atan2f(ax - gPlayer.position.x, az - gPlayer.position.z);
+                aimPoint.x = ray.position.x + ray.direction.x * t;
+                aimPoint.z = ray.position.z + ray.direction.z * t;
+                gPlayer.rotY = atan2f(aimPoint.x - gPlayer.position.x, aimPoint.z - gPlayer.position.z);
             }
         }
+
+        if (IsKeyPressed(KEY_R)) weapon_start_reload();
+        gState.fireCd -= dt;
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) weapon_fire(aimPoint);
+        if (gState.reloading) {
+            gState.reloadT += dt;
+            if (gState.reloadT >= gState.reloadTime) weapon_finish_reload();
+        }
+
+        weapon_update_bullets(dt);
+        effects_update(dt);
 
         float inv = dt > 0.0f ? 1.0f / dt : 0.0f;
         player_animate(dt, (gPlayer.position.x - px) * inv, (gPlayer.position.z - pz) * inv);
@@ -67,13 +85,18 @@ int main(void) {
         BeginMode3D(gScene.camera);
         world_draw(gPlayer.position);
         player_draw();
+        weapon_draw_bullets();
+        effects_draw();
         EndMode3D();
 
-        DrawText("Step 4: Procedural Gait & Two-Bone IK Survivor Rig", 20, 20, 20, RAYWHITE);
+        DrawText(TextFormat("Step 5: Aim & Fire | MAG: %d/%d %s",
+                            gState.mag, gState.magSize, gState.reloading ? "(RELOADING)" : ""),
+                 20, 20, 20, RAYWHITE);
         EndDrawing();
     }
 
     player_cleanup();
+    effects_cleanup();
     world_cleanup();
     scene_cleanup();
     CloseWindow();
