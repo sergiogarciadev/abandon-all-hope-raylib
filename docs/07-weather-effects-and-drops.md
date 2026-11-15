@@ -26,3 +26,10 @@ Every zombie kill increments `sinceDrop`. With a `5%` base chance (plus `SCAVENG
 - `BOTTOMLESS MAG` (8s of infinite magazine)
 
 Drops outside the cabin automatically slide inward so the player can always reach them, and pull toward the player within `2.5` units.
+
+
+---
+
+## Hands-On Example
+
+- [`examples/ex07_storm_weather.c`](../examples/ex07_storm_weather.c) — Rain streaks, ground splash rings, and double-exponential lightning flash (`-DBUILD_LESSON_EXAMPLE=ex07_storm_weather`).

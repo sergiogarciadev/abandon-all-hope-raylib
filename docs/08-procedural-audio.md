@@ -94,3 +94,10 @@ Rather than looping a static track, `music_update_state(wave, alive, lowHp, dt)`
 ---
 
 **Next:** [Chapter 9: Creating the UI & Full Game Loop](09-creating-the-ui.md)
+
+
+---
+
+## Hands-On Example
+
+- [`examples/ex08_procedural_synth.c`](../examples/ex08_procedural_synth.c) — `AudioStream` callback with `PTHREAD_MUTEX_RECURSIVE`, 15-bit LFSR noise, SVF filter, and interactive SFX/chord keys `1–4` (`-DBUILD_LESSON_EXAMPLE=ex08_procedural_synth`).

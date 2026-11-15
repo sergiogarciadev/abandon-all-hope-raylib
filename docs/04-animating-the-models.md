@@ -21,3 +21,11 @@ The survivor's rig splits into two coordinated halves:
 - **Lower body (`mLower`)**: Turns toward the travel direction (or flips into a backpedal with hysteresis when running away from the aim line), capped at `HIP_MAX = 1.0 rad`.
 - **Upper body (`mUpper`)**: Blades toward the gun aim (`-0.62 rad`), leans into the velocity vector, kicks back on shots, and tips the rifle in during reloads.
 - **Hands**: The right hand stays locked to `GRIP_R` (pistol grip); the left hand stays on `GRIP_L` (handguard) and follows a 7-keyframe `reload_hand()` path from the magwell to the chest-rig pouch and back.
+
+
+---
+
+## Hands-On Examples
+
+- [`examples/ex04_gait_cycle.c`](../examples/ex04_gait_cycle.c) — Asymmetric `foot_cycle()` stance/swing gait curve and pelvis bob (`-DBUILD_LESSON_EXAMPLE=ex04_gait_cycle`).
+- [`examples/ex04_two_bone_ik.c`](../examples/ex04_two_bone_ik.c) — Interactive 3D two-bone inverse kinematics (`ik2`) with pole vector (`-DBUILD_LESSON_EXAMPLE=ex04_two_bone_ik`).

@@ -71,3 +71,11 @@ Rather than a static background, the title screen (`SCREEN_TITLE`) renders the l
 ---
 
 **Congratulations!** You now have a complete, procedural 3D zombie survival shooter in C11 and Raylib.
+
+
+---
+
+## Hands-On Examples
+
+- [`examples/ex09_pixel_icons_hud.c`](../examples/ex09_pixel_icons_hud.c) — 8×7 pixel-art heart HP pips and 2-tone (`X`/`o`) 8×8 upgrade cards (`-DBUILD_LESSON_EXAMPLE=ex09_pixel_icons_hud`).
+- [`examples/ex09_distressed_ui.c`](../examples/ex09_distressed_ui.c) — Custom TTF font loading and 4-octave fractal-noise `DISTRESS_FS` shader over live 3D (`-DBUILD_LESSON_EXAMPLE=ex09_distressed_ui`).

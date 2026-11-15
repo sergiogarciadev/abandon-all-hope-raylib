@@ -23,3 +23,16 @@ cmake -B build -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_EXE_LINKER_FLAGS="-fuse
 cmake --build build
 ./build/abandon_all_hope
 ```
+
+
+## Building Lesson Examples
+
+Each chapter includes standalone minimal examples in `examples/`. You can build all of them or a single example via CMake:
+
+```bash
+# Build all 12 lesson examples alongside the game
+cmake -B build -DBUILD_LESSON_EXAMPLES=ON && cmake --build build
+
+# Or build just one specific example
+cmake -B build -DBUILD_LESSON_EXAMPLE=ex04_two_bone_ik && cmake --build build --target ex04_two_bone_ik
+```

@@ -27,3 +27,10 @@ For solid yard props like the rusted pickup truck, we precompute a **visibility 
 - `route_around(pos, tx, tz, &via)` returns `(tx, tz)` directly if unobstructed; otherwise it runs Dijkstra from the goal across the corner nodes and returns the best visible corner (with a `1.0` hysteresis bonus for `via` so zombies don't dither between two equal routes).
 
 Finally, `zombies_separate()` pushes overlapping zombies apart (`Z_SPACE = 0.8`), keeps them outside `Z_CLOSE` (`0.95`) of the survivor, and calls `push_out_of_solids()`.
+
+
+---
+
+## Hands-On Example
+
+- [`examples/ex06_zombie_ai.c`](../examples/ex06_zombie_ai.c) — Zombie AI state machine (`CHASE` → `BASH WINDOW` → `CLIMBING OVER SILL`) (`-DBUILD_LESSON_EXAMPLE=ex06_zombie_ai`).

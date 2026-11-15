@@ -33,3 +33,10 @@ Rather than loading external PNGs, we generate a `128x128` pixel-art moss/needle
 - We scale the `200x200` plane's UVs by `25.0f` and upload the modified texcoord buffer with `UpdateMeshBuffer()`.
 
 With `ClearBackground(gScene.fogColor)` and our fog shader, the ground fades seamlessly into the night!
+
+
+---
+
+## Hands-On Example
+
+- [`examples/ex02_empty_world.c`](../examples/ex02_empty_world.c) — Top-down 3D camera, orbiting point light, directional moonlight, and GLSL 330 distance fog shader (`-DBUILD_LESSON_EXAMPLE=ex02_empty_world`).

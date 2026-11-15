@@ -30,3 +30,10 @@ Bullets travel at `38 units/second`. At 30 FPS (`dt = 0.033s`), a single step is
 - We divide the segment traveled this frame into steps of at most `WALL_T * 0.5`.
 - Each sub-step checks `gWorld.wallBoxes` and `shut_at(sx, sz)` (doors stop bullets; glass windows shatter on impact and let the bullet pass through).
 - For zombies, we compute the closest point on the bullet's line segment to each zombie center (`dx*dx + dz*dz < 0.55`).
+
+
+---
+
+## Hands-On Example
+
+- [`examples/ex05_raycast_aim.c`](../examples/ex05_raycast_aim.c) — Mouse raycast aiming onto `y = 0.9`, tracer bullets, and ejecting brass casings (`-DBUILD_LESSON_EXAMPLE=ex05_raycast_aim`).

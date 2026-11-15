@@ -51,6 +51,37 @@ add_custom_command(TARGET abandon_all_hope POST_BUILD
   ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:abandon_all_hope>/assets
 )
 
+# Optional lesson examples:
+#   -DBUILD_LESSON_EXAMPLES=ON               (build all examples)
+#   -DBUILD_LESSON_EXAMPLE=ex04_two_bone_ik  (build a single example)
+option(BUILD_LESSON_EXAMPLES "Build all standalone lesson examples" OFF)
+set(BUILD_LESSON_EXAMPLE "" CACHE STRING "Build a single lesson example target (e.g. ex04_two_bone_ik)")
+
+set(LESSON_EXAMPLES
+  ex01_window
+  ex02_empty_world
+  ex03_chamfered_mesh
+  ex03_dijkstra_grid
+  ex04_gait_cycle
+  ex04_two_bone_ik
+  ex05_raycast_aim
+  ex06_zombie_ai
+  ex07_storm_weather
+  ex08_procedural_synth
+  ex09_pixel_icons_hud
+  ex09_distressed_ui
+)
+
+foreach(ex IN LISTS LESSON_EXAMPLES)
+  if(BUILD_LESSON_EXAMPLES OR BUILD_LESSON_EXAMPLE STREQUAL "${ex}")
+    add_executable(${ex} examples/${ex}.c)
+    target_link_libraries(${ex} PRIVATE raylib m pthread)
+    if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+      target_compile_options(${ex} PRIVATE -Wall -Wextra -Wno-missing-braces)
+    endif()
+  endif()
+endforeach()
+
 if(CMAKE_C_COMPILER_ID MATCHES "Clang")
   target_compile_options(abandon_all_hope PRIVATE -Wall -Wextra -Wno-missing-braces)
 endif()

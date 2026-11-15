@@ -31,3 +31,11 @@ Using `BlockBatch`, `world_init()` constructs:
 - **Log Walls & Openings**: Interleaved log courses with mortar chinking, end-grain caps, fieldstone footings, two hinged doors, and three paned windows (`openings.c`), plus interior details (pantry shelf with jars/books, deer skull trophy, calendar, coat & hat, mirror).
 - **The Yard**: Stacked firewood, chopping block with embedded axe, rusted pickup truck (registered in `solids.c` for collision/pathfinding), flickering porch lantern, broken fence, stumps, and a fallen trunk.
 - **The Forest**: 900 trees (pines, spruces, oaks, dead snags) and 1,000 brush props (grass tufts, ferns, rocks) scattered in an annulus around the clearings. Near trees use chamfered blocks; far trees use 12-triangle plain boxes.
+
+
+---
+
+## Hands-On Examples
+
+- [`examples/ex03_chamfered_mesh.c`](../examples/ex03_chamfered_mesh.c) — Procedural 45° chamfered cuboid mesh with baked vertex colors (`-DBUILD_LESSON_EXAMPLE=ex03_chamfered_mesh`).
+- [`examples/ex03_dijkstra_grid.c`](../examples/ex03_dijkstra_grid.c) — Interactive Dijkstra shortest-path routing around rectangular obstacles (`-DBUILD_LESSON_EXAMPLE=ex03_dijkstra_grid`).

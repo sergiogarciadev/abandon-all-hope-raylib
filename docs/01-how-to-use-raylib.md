@@ -74,3 +74,10 @@ int main(void) {
 - `BeginDrawing()` / `EndDrawing()` bookend every frame's rendering.
 - `GetFrameTime()` returns the elapsed seconds since the previous frame—always clamp it (e.g., `fminf(GetFrameTime(), 0.05f)`) so alt-tabbing or debugging never causes huge physics jumps.
 - Raylib uses a **right-handed** 3D coordinate system (`+Y` up, `+X` right, `+Z` toward the viewer), matching Three.js! This makes porting positions, rotations, and camera offsets straightforward.
+
+
+---
+
+## Hands-On Example
+
+- [`examples/ex01_window.c`](../examples/ex01_window.c) — Minimal Raylib window, `GetFrameTime()` delta-time movement, and normalized diagonal input (`-DBUILD_LESSON_EXAMPLE=ex01_window`).
