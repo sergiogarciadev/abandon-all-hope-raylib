@@ -19,6 +19,7 @@ FetchContent_MakeAvailable(raylib)
 
 add_executable(abandon_all_hope
   src/main.c
+  src/core/scene.c
 )
 
 target_include_directories(abandon_all_hope PRIVATE src)
