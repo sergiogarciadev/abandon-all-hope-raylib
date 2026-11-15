@@ -5,6 +5,12 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+option(TARGET_WEB "Build for WebAssembly + WebGL (use with emcmake)" OFF)
+if(EMSCRIPTEN OR TARGET_WEB)
+  set(PLATFORM "Web" CACHE STRING "" FORCE)
+  set(CMAKE_EXECUTABLE_SUFFIX ".html")
+endif()
+
 # Fetch Raylib 5.5
 include(FetchContent)
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -44,12 +50,22 @@ add_executable(abandon_all_hope
 )
 
 target_include_directories(abandon_all_hope PRIVATE src)
-target_link_libraries(abandon_all_hope PRIVATE raylib m pthread)
-
-add_custom_command(TARGET abandon_all_hope POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-  ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:abandon_all_hope>/assets
-)
+if(EMSCRIPTEN OR TARGET_WEB)
+  target_compile_definitions(abandon_all_hope PRIVATE PLATFORM_WEB)
+  target_link_libraries(abandon_all_hope PRIVATE raylib m)
+  target_link_options(abandon_all_hope PRIVATE
+    -sUSE_GLFW=3
+    -sALLOW_MEMORY_GROWTH=1
+    -sINITIAL_MEMORY=67108864
+    --preload-file ${CMAKE_SOURCE_DIR}/assets@/assets
+  )
+else()
+  target_link_libraries(abandon_all_hope PRIVATE raylib m pthread)
+  add_custom_command(TARGET abandon_all_hope POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:abandon_all_hope>/assets
+  )
+endif()
 
 # Optional lesson examples:
 #   -DBUILD_LESSON_EXAMPLES=ON               (build all examples)

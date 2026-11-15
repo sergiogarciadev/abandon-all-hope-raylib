@@ -2,9 +2,14 @@
 #include "core/math_util.h"
 #include "raylib.h"
 #include <math.h>
-#include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(PLATFORM_WEB)
+#define AUDIO_LOCK()   ((void)0)
+#define AUDIO_UNLOCK() ((void)0)
+#else
+#include <pthread.h>
+#endif
 
 #define MAX_VOICES 96
 #define TABLE_SIZE 512
@@ -33,7 +38,11 @@ typedef struct {
 
 static AudioStream gStream;
 static bool gAudioReady = false;
+#if !defined(PLATFORM_WEB)
 static pthread_mutex_t gMutex = PTHREAD_MUTEX_INITIALIZER;
+#define AUDIO_LOCK()   pthread_mutex_lock(&gMutex)
+#define AUDIO_UNLOCK() pthread_mutex_unlock(&gMutex)
+#endif
 
 static float gWaveTables[5][TABLE_SIZE]; // sine, tri, pulse12, pulse25, pulse50
 static float *gNoiseLong = NULL;
@@ -150,7 +159,7 @@ static void audio_callback(void *buffer, unsigned int frames) {
     short *out = (short *)buffer;
     const float dt = 1.0f / (float)SAMPLE_RATE;
 
-    pthread_mutex_lock(&gMutex);
+    AUDIO_LOCK();
 
     if (gMusicTick) {
         gMusicTick((float)frames * dt);
@@ -356,15 +365,17 @@ static void audio_callback(void *buffer, unsigned int frames) {
         out[f * 2 + 1] = (short)(clampf(finalR, -1.0f, 1.0f) * 32767.0f);
     }
 
-    pthread_mutex_unlock(&gMutex);
+    AUDIO_UNLOCK();
 }
 
 void synth_init(void) {
+#if !defined(PLATFORM_WEB)
     pthread_mutexattr_t attr;
     pthread_mutexattr_init(&attr);
     pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
     pthread_mutex_init(&gMutex, &attr);
     pthread_mutexattr_destroy(&attr);
+#endif
 
     build_tables();
     memset(gVoices, 0, sizeof(gVoices));
@@ -388,12 +399,14 @@ void synth_cleanup(void) {
     free(gNoiseLong); gNoiseLong = NULL;
     free(gNoiseMetal); gNoiseMetal = NULL;
     free(gNoiseWhite); gNoiseWhite = NULL;
+#if !defined(PLATFORM_WEB)
     pthread_mutex_destroy(&gMutex);
+#endif
 }
 
 void synth_spawn(const VoiceParams *p) {
     if (!gAudioReady) return;
-    pthread_mutex_lock(&gMutex);
+    AUDIO_LOCK();
     int slot = -1;
     for (int i = 0; i < MAX_VOICES; i++) {
         if (!gVoices[i].active) { slot = i; break; }
@@ -420,60 +433,60 @@ void synth_spawn(const VoiceParams *p) {
     if (p->type == WAVE_NOISE_LONG || p->type == WAVE_NOISE_METAL || p->type == WAVE_NOISE_WHITE) {
         v->noisePos = rndf(0.0f, 4096.0f);
     }
-    pthread_mutex_unlock(&gMutex);
+    AUDIO_UNLOCK();
 }
 
 void synth_set_volumes(int masterLvl, int musicLvl, bool muted) {
-    pthread_mutex_lock(&gMutex);
+    AUDIO_LOCK();
     float m = (float)masterLvl / 8.0f;
     float mu = (float)musicLvl / 8.0f;
     gMasterTarget = m * m;
     gMusicTarget = mu * mu;
     gMuted = muted;
-    pthread_mutex_unlock(&gMutex);
+    AUDIO_UNLOCK();
 }
 
 void synth_set_paused(bool paused) {
-    pthread_mutex_lock(&gMutex);
+    AUDIO_LOCK();
     gPauseTarget = paused ? 0.0f : 1.0f;
-    pthread_mutex_unlock(&gMutex);
+    AUDIO_UNLOCK();
 }
 
 void synth_set_weather(float level, float gust) {
-    pthread_mutex_lock(&gMutex);
+    AUDIO_LOCK();
     gWindTarget = 0.06f + 0.2f * level * level * gust;
-    pthread_mutex_unlock(&gMutex);
+    AUDIO_UNLOCK();
 }
 
 void synth_duck_music(float depth, float dur) {
-    pthread_mutex_lock(&gMutex);
+    AUDIO_LOCK();
     gDuckCur = depth;
     gDuckTarget = 1.0f;
     gDuckHoldT = dur;
     gDuckTau = fmaxf(0.05f, dur * 0.4f);
-    pthread_mutex_unlock(&gMutex);
+    AUDIO_UNLOCK();
 }
 
 void synth_muffle(float dur, float freq) {
-    pthread_mutex_lock(&gMutex);
+    AUDIO_LOCK();
     gMuffleFreq = freq;
     gMuffleHoldT = dur * 0.4f;
     gMuffleTau = fmaxf(0.05f, dur * 0.35f);
-    pthread_mutex_unlock(&gMutex);
+    AUDIO_UNLOCK();
 }
 
 void synth_set_music_lp(float freq) {
-    pthread_mutex_lock(&gMutex);
+    AUDIO_LOCK();
     gMusicLpTarget = freq;
-    pthread_mutex_unlock(&gMutex);
+    AUDIO_UNLOCK();
 }
 
 void synth_set_music_duck_target(float target, float tau) {
-    pthread_mutex_lock(&gMutex);
+    AUDIO_LOCK();
     gDuckTarget = target;
     gDuckHoldT = 0.0f;
     gDuckTau = tau;
-    pthread_mutex_unlock(&gMutex);
+    AUDIO_UNLOCK();
 }
 
 void synth_trigger_pump(void) {
@@ -485,7 +498,7 @@ void synth_set_echo_delay(float sec) {
 }
 
 void synth_set_music_tick(MusicTickFn fn) {
-    pthread_mutex_lock(&gMutex);
+    AUDIO_LOCK();
     gMusicTick = fn;
-    pthread_mutex_unlock(&gMutex);
+    AUDIO_UNLOCK();
 }

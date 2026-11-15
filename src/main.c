@@ -2,6 +2,15 @@
 #include "game.h"
 #include "ui/title.h"
 #include <math.h>
+#if defined(PLATFORM_WEB)
+#include <emscripten/emscripten.h>
+#endif
+
+static void update_draw_frame(void) {
+    float dt = fminf(GetFrameTime(), 0.05f);
+    game_update(dt);
+    game_draw();
+}
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
@@ -11,11 +20,13 @@ int main(void) {
 
     game_init();
 
+#if defined(PLATFORM_WEB)
+    emscripten_set_main_loop(update_draw_frame, 0, 1);
+#else
     while (!WindowShouldClose() && !title_should_quit()) {
-        float dt = fminf(GetFrameTime(), 0.05f);
-        game_update(dt);
-        game_draw();
+        update_draw_frame();
     }
+#endif
 
     game_cleanup();
     CloseWindow();

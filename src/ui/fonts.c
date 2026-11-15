@@ -18,6 +18,22 @@ static Shader sDistressShader = {0};
 static int sGritLoc = -1;
 static int sScreenHLoc = -1;
 
+#if defined(PLATFORM_WEB)
+static const char *DISTRESS_FS =
+    "#version 100\n"
+    "precision mediump float;\n"
+    "varying vec2 fragTexCoord;\n"
+    "varying vec4 fragColor;\n"
+    "uniform sampler2D texture0;\n"
+    "uniform sampler2D gritTex;\n"
+    "uniform float screenH;\n"
+    "void main() {\n"
+    "    vec4 c = texture2D(texture0, fragTexCoord) * fragColor;\n"
+    "    vec2 gUV = vec2(gl_FragCoord.x / 600.0, (screenH - gl_FragCoord.y) / 300.0);\n"
+    "    float mask = texture2D(gritTex, gUV).a;\n"
+    "    gl_FragColor = vec4(c.rgb, c.a * mask);\n"
+    "}\n";
+#else
 static const char *DISTRESS_FS =
     "#version 330\n"
     "in vec2 fragTexCoord;\n"
@@ -32,6 +48,7 @@ static const char *DISTRESS_FS =
     "    float mask = texture(gritTex, gUV).a;\n"
     "    finalColor = vec4(c.rgb, c.a * mask);\n"
     "}\n";
+#endif
 
 static float hash2d(int ix, int iy, unsigned int seed) {
     unsigned int n = (unsigned int)ix * 374761393u + (unsigned int)iy * 668265263u + seed * 1442695041u;

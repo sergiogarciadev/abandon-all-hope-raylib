@@ -36,3 +36,15 @@ cmake -B build -DBUILD_LESSON_EXAMPLES=ON && cmake --build build
 # Or build just one specific example
 cmake -B build -DBUILD_LESSON_EXAMPLE=ex04_two_bone_ik && cmake --build build --target ex04_two_bone_ik
 ```
+
+## Web Build (WebAssembly + WebGL)
+
+Using the [Emscripten SDK](https://emscripten.org/) (`emcmake`):
+
+```bash
+emcmake cmake -B build-web -DTARGET_WEB=ON
+cmake --build build-web
+python3 -m http.server -d build-web 8080
+```
+
+Then open `http://localhost:8080/abandon_all_hope.html` in your browser. Setting `TARGET_WEB=ON` (or running under `emcmake`) automatically configures Raylib with `PLATFORM=Web` (WebGL / GLSL ES 1.00), switches `main.c` to `emscripten_set_main_loop()`, and preloads `assets/` into the virtual filesystem.
