@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "raymath.h"
+#include <stddef.h>
 #include "core/math_util.h"
 #include "core/scene.h"
 #include "core/state.h"
@@ -8,6 +9,7 @@
 #include "effects/particles.h"
 #include "entities/player.h"
 #include "entities/weapon.h"
+#include "entities/zombies.h"
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
@@ -16,10 +18,12 @@ int main(void) {
 
     state_reset_stats();
     gState.running = true;
+    gState.toSpawn = 8;
     scene_init();
     world_init();
     effects_init();
     player_init();
+    zombies_init();
     weapon_clear();
 
     Vector3 aimPoint = { 0.0f, 0.9f, 5.0f };
@@ -60,7 +64,14 @@ int main(void) {
             if (gState.reloadT >= gState.reloadTime) weapon_finish_reload();
         }
 
+        gState.spawnTimer -= dt;
+        if (gState.spawnTimer <= 0.0f && gZombieCount < 10) {
+            zombies_spawn(NULL);
+            gState.spawnTimer = 1.2f;
+        }
+
         weapon_update_bullets(dt);
+        zombies_update(dt, true, false);
         effects_update(dt);
 
         float inv = dt > 0.0f ? 1.0f / dt : 0.0f;
@@ -85,16 +96,18 @@ int main(void) {
         BeginMode3D(gScene.camera);
         world_draw(gPlayer.position);
         player_draw();
+        zombies_draw();
         weapon_draw_bullets();
         effects_draw();
         EndMode3D();
 
-        DrawText(TextFormat("Step 5: Aim & Fire | MAG: %d/%d %s",
-                            gState.mag, gState.magSize, gState.reloading ? "(RELOADING)" : ""),
+        DrawText(TextFormat("Step 6: Zombie AI & Pathfinding | KILLS: %d | ALIVE: %d",
+                            gState.kills, gZombieCount),
                  20, 20, 20, RAYWHITE);
         EndDrawing();
     }
 
+    zombies_cleanup();
     player_cleanup();
     effects_cleanup();
     world_cleanup();

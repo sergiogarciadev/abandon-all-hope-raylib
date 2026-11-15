@@ -1,5 +1,6 @@
 #include "weapon.h"
 #include "player.h"
+#include "zombies.h"
 #include "core/state.h"
 #include "core/math_util.h"
 #include "world/world.h"
@@ -131,6 +132,35 @@ void weapon_update_bullets(float dt) {
                                             16, DEBRIS_GLASS, 0.09f, 4.0f);
                     }
                 }
+            }
+        }
+
+        for (int j = 0; j < MAX_ZOMBIES && !hit; j++) {
+            Zombie *z = &gZombies[j];
+            if (!z->active) continue;
+            bool alreadyHit = false;
+            for (int h = 0; h < b->hitCount; h++) {
+                if (b->hitIds[h] == z->id) { alreadyHit = true; break; }
+            }
+            if (alreadyHit) continue;
+
+            float sx = b->pos.x - bpx, sz = b->pos.z - bpz;
+            float denom = sx * sx + sz * sz;
+            float t = denom > 0.0f ? ((z->pos.x - bpx) * sx + (z->pos.z - bpz) * sz) / denom : 0.0f;
+            t = clampf(t, 0.0f, 1.0f);
+            float dx = z->pos.x - (bpx + sx * t);
+            float dz = z->pos.z - (bpz + sz * t);
+            if (dx * dx + dz * dz < 0.55f) {
+                z->hp -= gState.damage * (gState.pDamage > 0.0f ? 2.0f : 1.0f);
+                zombies_hit(z);
+                z->pos.x += b->dir.x * 0.25f;
+                z->pos.z += b->dir.z * 0.25f;
+                if (z->hp <= 0.0f) {
+                    zombies_kill(z, b->dir);
+                }
+                if (b->hitCount < MAX_PIERCE_HITS) b->hitIds[b->hitCount++] = z->id;
+                if (b->pierce > 0) b->pierce--;
+                else hit = true;
             }
         }
 

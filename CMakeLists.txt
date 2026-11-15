@@ -29,6 +29,7 @@ add_executable(abandon_all_hope
   src/entities/animation.c
   src/entities/player.c
   src/entities/weapon.c
+  src/entities/zombies.c
 )
 
 target_include_directories(abandon_all_hope PRIVATE src)
