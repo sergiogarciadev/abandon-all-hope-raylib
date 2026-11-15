@@ -360,6 +360,12 @@ static void audio_callback(void *buffer, unsigned int frames) {
 }
 
 void synth_init(void) {
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&gMutex, &attr);
+    pthread_mutexattr_destroy(&attr);
+
     build_tables();
     memset(gVoices, 0, sizeof(gVoices));
     InitAudioDevice();
@@ -382,6 +388,7 @@ void synth_cleanup(void) {
     free(gNoiseLong); gNoiseLong = NULL;
     free(gNoiseMetal); gNoiseMetal = NULL;
     free(gNoiseWhite); gNoiseWhite = NULL;
+    pthread_mutex_destroy(&gMutex);
 }
 
 void synth_spawn(const VoiceParams *p) {
