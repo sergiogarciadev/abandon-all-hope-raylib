@@ -116,12 +116,12 @@ void title_draw(void) {
 
         const char *titleTop = "ABANDON";
         const char *titleMain = "ALL HOPE";
-        float ttw = font_measure(gFontAnton, titleTop, 38.0f, 10.0f);
-        float tmw = font_measure(gFontAnton, titleMain, 96.0f, 4.0f);
-        font_draw_distressed(gFontAnton, titleTop, ((float)sw - ttw) * 0.5f, (float)sh * 0.5f - 235.0f,
-                             38.0f, 10.0f, hex_color(0xe9e2d6, 255), 11u);
-        font_draw_distressed(gFontAnton, titleMain, ((float)sw - tmw) * 0.5f, (float)sh * 0.5f - 196.0f,
-                             96.0f, 4.0f, hex_color(0xd6453c, 255), 29u);
+        float ttw = font_measure(gFontAnton, titleTop, 57.0f, 15.0f);
+        float tmw = font_measure(gFontAnton, titleMain, 144.0f, 6.0f);
+        font_draw_distressed(gFontAnton, titleTop, ((float)sw - ttw) * 0.5f, (float)sh * 0.5f - 302.0f,
+                             57.0f, 15.0f, hex_color(0xe9e2d6, 255), 11u);
+        font_draw_distressed(gFontAnton, titleMain, ((float)sw - tmw) * 0.5f, (float)sh * 0.5f - 245.0f,
+                             144.0f, 6.0f, hex_color(0xd6453c, 255), 29u);
 
         const char *sub = "HOLD THE CABIN. SURVIVE THE NIGHT.";
         float suw = font_measure(gFontJersey, sub, 20.0f, 2.5f);
@@ -243,9 +243,9 @@ void title_draw(void) {
     if (gScreen == SCREEN_PAUSED) {
         DrawRectangle(0, 0, sw, sh, (Color){ 6, 8, 12, 175 });
         const char *hdr = "PAUSED";
-        float hw = font_measure(gFontAnton, hdr, 78.0f, 8.0f);
-        font_draw_distressed(gFontAnton, hdr, ((float)sw - hw) * 0.5f, (float)sh * 0.5f - 175.0f,
-                             78.0f, 8.0f, hex_color(0xe9e2d6, 255), 53u);
+        float hw = font_measure(gFontAnton, hdr, 117.0f, 12.0f);
+        font_draw_distressed(gFontAnton, hdr, ((float)sw - hw) * 0.5f, (float)sh * 0.5f - 205.0f,
+                             117.0f, 12.0f, hex_color(0xe9e2d6, 255), 53u);
 
         float bw = 240.0f, bh = 46.0f, bx = ((float)sw - bw) * 0.5f;
         float by = (float)sh * 0.5f - 62.0f;
@@ -264,9 +264,9 @@ void title_draw(void) {
     if (gScreen == SCREEN_DEAD) {
         DrawRectangle(0, 0, sw, sh, (Color){ 18, 4, 6, 185 });
         const char *hdr = "YOU DIED";
-        float hw = font_measure(gFontAnton, hdr, 88.0f, 8.0f);
-        font_draw_distressed(gFontAnton, hdr, ((float)sw - hw) * 0.5f, (float)sh * 0.5f - 196.0f,
-                             88.0f, 8.0f, hex_color(0xb8332b, 255), 71u);
+        float hw = font_measure(gFontAnton, hdr, 132.0f, 12.0f);
+        font_draw_distressed(gFontAnton, hdr, ((float)sw - hw) * 0.5f, (float)sh * 0.5f - 232.0f,
+                             132.0f, 12.0f, hex_color(0xb8332b, 255), 71u);
 
         const char *stats = TextFormat("YOU REACHED WAVE %d  ·  %d KILLS", sDeathWave, sDeathKills);
         float stw = font_measure(gFontJersey, stats, 24.0f, 3.0f);

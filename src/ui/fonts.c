@@ -111,7 +111,7 @@ static Font load_font_asset(const char *relPath, const char *altPath, int baseSi
 
 void fonts_init(void) {
     gFontAnton = load_font_asset("assets/fonts/Anton-Regular.ttf",
-                                 "../assets/fonts/Anton-Regular.ttf", 96, &sAntonLoaded);
+                                 "../assets/fonts/Anton-Regular.ttf", 144, &sAntonLoaded);
     gFontJersey = load_font_asset("assets/fonts/Jersey25-Regular.ttf",
                                   "../assets/fonts/Jersey25-Regular.ttf", 36, &sJerseyLoaded);
     gFontNightshade = load_font_asset("assets/fonts/JimNightshade-Regular.ttf",
