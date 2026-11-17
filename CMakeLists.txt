@@ -59,6 +59,7 @@ if(EMSCRIPTEN OR TARGET_WEB)
     -sINITIAL_MEMORY=67108864
     -sSTACK_SIZE=2097152
     -sEXPORTED_RUNTIME_METHODS=HEAPF32
+    --shell-file ${CMAKE_SOURCE_DIR}/web/shell.html
     --preload-file ${CMAKE_SOURCE_DIR}/assets@/assets
   )
 else()
