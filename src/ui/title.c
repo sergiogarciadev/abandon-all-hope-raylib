@@ -149,9 +149,11 @@ void title_draw(void) {
         if (ui_button((Rectangle){ bx, by + 128.0f, bw, bh }, "SETTINGS", false)) {
             title_set_screen(SCREEN_SETTINGS);
         }
+#if !defined(PLATFORM_WEB)
         if (ui_button((Rectangle){ bx, by + 192.0f, bw, bh }, "QUIT", false)) {
             sShouldQuit = true;
         }
+#endif
         return;
     }
 

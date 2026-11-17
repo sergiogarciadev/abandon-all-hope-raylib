@@ -29,7 +29,7 @@ static const char *DISTRESS_FS =
     "uniform float screenH;\n"
     "void main() {\n"
     "    vec4 c = texture2D(texture0, fragTexCoord) * fragColor;\n"
-    "    vec2 gUV = vec2(gl_FragCoord.x / 600.0, (screenH - gl_FragCoord.y) / 300.0);\n"
+    "    vec2 gUV = vec2(gl_FragCoord.x / 512.0, (screenH - gl_FragCoord.y) / 256.0);\n"
     "    float mask = texture2D(gritTex, gUV).a;\n"
     "    gl_FragColor = vec4(c.rgb, c.a * mask);\n"
     "}\n";
@@ -44,7 +44,7 @@ static const char *DISTRESS_FS =
     "out vec4 finalColor;\n"
     "void main() {\n"
     "    vec4 c = texture(texture0, fragTexCoord) * fragColor;\n"
-    "    vec2 gUV = vec2(gl_FragCoord.x / 600.0, (screenH - gl_FragCoord.y) / 300.0);\n"
+    "    vec2 gUV = vec2(gl_FragCoord.x / 512.0, (screenH - gl_FragCoord.y) / 256.0);\n"
     "    float mask = texture(gritTex, gUV).a;\n"
     "    finalColor = vec4(c.rgb, c.a * mask);\n"
     "}\n";
@@ -71,7 +71,7 @@ static float value_noise_2d(float x, float y, unsigned int seed) {
 }
 
 static void build_grit_mask(void) {
-    const int W = 600, H = 300;
+    const int W = 512, H = 256; // Power-of-two for WebGL1 TEXTURE_WRAP_REPEAT support
     Color *px = (Color *)malloc((size_t)(W * H) * sizeof(Color));
     if (!px) return;
 
