@@ -1,5 +1,6 @@
 #include "title.h"
 #include "fonts.h"
+#include "core/input.h"
 #include "core/storage.h"
 #include "core/scene.h"
 #include "core/math_util.h"
@@ -48,9 +49,9 @@ void title_set_death_info(int wave, int kills, bool isNewBest) {
 }
 
 static bool ui_button(Rectangle r, const char *label, bool primary) {
-    Vector2 mp = GetMousePosition();
+    Vector2 mp = input_mouse_pos();
     bool hover = CheckCollisionPointRec(mp, r);
-    if (hover && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    if (hover && input_mouse_pressed(MOUSE_BUTTON_LEFT)) {
         sfx_ui("click");
         return true;
     }
@@ -139,7 +140,7 @@ void title_draw(void) {
         float by = (float)sh * 0.5f - 28.0f;
 
         if (ui_button((Rectangle){ bx, by, bw, bh }, "PLAY", true) ||
-            IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
+            input_key_pressed(KEY_ENTER) || input_key_pressed(KEY_SPACE)) {
             if (sCbs.onPlay) sCbs.onPlay();
         }
         if (ui_button((Rectangle){ bx, by + 64.0f, bw, bh }, "HOW TO PLAY", false)) {

@@ -3,6 +3,7 @@
 #include "core/scene.h"
 #include "core/state.h"
 #include "core/storage.h"
+#include "core/input.h"
 #include "world/world.h"
 #include "world/solids.h"
 #include "world/openings.h"
@@ -143,6 +144,7 @@ static void cb_quit_to_title(void) {
 }
 
 void game_init(void) {
+    input_init();
     storage_load();
     state_reset_stats();
     scene_init();
@@ -177,7 +179,7 @@ void game_init(void) {
 
 void game_update(float dt) {
     // Global mute toggle
-    if (IsKeyPressed(KEY_M)) {
+    if (input_key_pressed(KEY_M)) {
         gSettings.muted = !gSettings.muted;
         storage_save();
         apply_audio_settings();
@@ -187,7 +189,7 @@ void game_update(float dt) {
     }
 
     // Pause / Resume toggle
-    if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_P)) {
+    if (input_key_pressed(KEY_ESCAPE) || input_key_pressed(KEY_P)) {
         if (gScreen == SCREEN_PLAYING && gState.running && !gState.choosing) {
             gState.paused = true;
             synth_set_paused(true);
@@ -221,10 +223,10 @@ void game_update(float dt) {
     float px = gPlayer.position.x, pz = gPlayer.position.z;
     if (gState.running && gScreen == SCREEN_PLAYING) {
         float mx = 0.0f, mz = 0.0f;
-        if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) mz -= 1.0f;
-        if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) mz += 1.0f;
-        if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) mx -= 1.0f;
-        if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) mx += 1.0f;
+        if (input_key_down(KEY_W) || input_key_down(KEY_UP)) mz -= 1.0f;
+        if (input_key_down(KEY_S) || input_key_down(KEY_DOWN)) mz += 1.0f;
+        if (input_key_down(KEY_A) || input_key_down(KEY_LEFT)) mx -= 1.0f;
+        if (input_key_down(KEY_D) || input_key_down(KEY_RIGHT)) mx += 1.0f;
         float len = hypotf(mx, mz);
         if (len > 0.0f) {
             gPlayer.position.x += (mx / len) * gState.speed * dt;
@@ -235,7 +237,7 @@ void game_update(float dt) {
         gPlayer.position.x = clampf(gPlayer.position.x, -lim, lim);
         gPlayer.position.z = clampf(gPlayer.position.z, -lim, lim);
 
-        Ray ray = GetScreenToWorldRay(GetMousePosition(), gScene.camera);
+        Ray ray = GetScreenToWorldRay(input_mouse_pos(), gScene.camera);
         if (fabsf(ray.direction.y) > 1e-5f) {
             float t = (0.9f - ray.position.y) / ray.direction.y;
             if (t > 0.0f) {
@@ -245,9 +247,9 @@ void game_update(float dt) {
             }
         }
 
-        if (IsKeyPressed(KEY_R)) weapon_start_reload();
+        if (input_key_pressed(KEY_R)) weapon_start_reload();
         gState.fireCd -= dt;
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) weapon_fire(sAimPoint);
+        if (input_mouse_down(MOUSE_BUTTON_LEFT)) weapon_fire(sAimPoint);
         if (gState.reloading) {
             gState.reloadT += dt;
             if (gState.reloadT >= gState.reloadTime) weapon_finish_reload();

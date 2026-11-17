@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "game.h"
+#include "core/input.h"
 #include "ui/title.h"
 #include <math.h>
 #if defined(PLATFORM_WEB)
@@ -10,6 +11,7 @@ static void update_draw_frame(void) {
     float dt = fminf(GetFrameTime(), 0.05f);
     game_update(dt);
     game_draw();
+    input_end_frame();
 }
 
 int main(void) {

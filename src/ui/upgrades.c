@@ -1,5 +1,6 @@
 #include "upgrades.h"
 #include "fonts.h"
+#include "core/input.h"
 #include "core/state.h"
 #include "core/math_util.h"
 #include "audio/sfx.h"
@@ -245,7 +246,7 @@ bool upgrades_update(float dt) {
 
     int sw = GetScreenWidth();
     int sh = GetScreenHeight();
-    Vector2 mp = GetMousePosition();
+    Vector2 mp = input_mouse_pos();
 
     int newHover = -1;
     for (int i = 0; i < sChoiceCount; i++) {
@@ -262,12 +263,12 @@ bool upgrades_update(float dt) {
     sHovered = newHover;
 
     int pickedSlot = -1;
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && sHovered >= 0) {
+    if (input_mouse_pressed(MOUSE_BUTTON_LEFT) && sHovered >= 0) {
         pickedSlot = sHovered;
     }
-    if (IsKeyPressed(KEY_ONE) && sChoiceCount >= 1) pickedSlot = 0;
-    if (IsKeyPressed(KEY_TWO) && sChoiceCount >= 2) pickedSlot = 1;
-    if (IsKeyPressed(KEY_THREE) && sChoiceCount >= 3) pickedSlot = 2;
+    if (input_key_pressed(KEY_ONE) && sChoiceCount >= 1) pickedSlot = 0;
+    if (input_key_pressed(KEY_TWO) && sChoiceCount >= 2) pickedSlot = 1;
+    if (input_key_pressed(KEY_THREE) && sChoiceCount >= 3) pickedSlot = 2;
 
     if (pickedSlot >= 0) {
         int idx = sChoices[pickedSlot];

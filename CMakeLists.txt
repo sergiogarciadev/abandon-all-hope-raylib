@@ -29,6 +29,7 @@ add_executable(abandon_all_hope
   src/core/blocks.c
   src/core/state.c
   src/core/storage.c
+  src/core/input.c
   src/world/solids.c
   src/world/openings.c
   src/world/world.c
