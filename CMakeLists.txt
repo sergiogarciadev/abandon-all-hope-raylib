@@ -57,6 +57,7 @@ if(EMSCRIPTEN OR TARGET_WEB)
     -sUSE_GLFW=3
     -sALLOW_MEMORY_GROWTH=1
     -sINITIAL_MEMORY=67108864
+    -sSTACK_SIZE=2097152
     --preload-file ${CMAKE_SOURCE_DIR}/assets@/assets
   )
 else()
