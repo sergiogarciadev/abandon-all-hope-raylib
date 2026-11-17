@@ -138,7 +138,8 @@ void title_draw(void) {
         float bw = 260.0f, bh = 48.0f, bx = ((float)sw - bw) * 0.5f;
         float by = (float)sh * 0.5f - 28.0f;
 
-        if (ui_button((Rectangle){ bx, by, bw, bh }, "PLAY", true)) {
+        if (ui_button((Rectangle){ bx, by, bw, bh }, "PLAY", true) ||
+            IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)) {
             if (sCbs.onPlay) sCbs.onPlay();
         }
         if (ui_button((Rectangle){ bx, by + 64.0f, bw, bh }, "HOW TO PLAY", false)) {
